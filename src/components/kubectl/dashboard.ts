@@ -31,7 +31,7 @@ let terminal: vscode.Terminal;
  * 2. Is the node name prefixed with `aks-`? (TODO: identify if there's a better method for this/convince AKS team to add a label) for this.
  * @returns Boolean identifying if we think this is an AKS cluster.
  */
-async function isAKSCluster (): Promise<boolean> {
+async function isAKSCluster(): Promise<boolean> {
     const nodes = await kubectl.asJson<KubernetesCollection<Node>>('get nodes -o json');
     if (failed(nodes)) {
         return false;
@@ -67,7 +67,7 @@ function _isNodeAKS(node: Node): boolean {
  *
  * @returns The name of the dashboard pod.
  */
-async function findDashboardPod (): Promise<string> {
+async function findDashboardPod(): Promise<string> {
     const dashboardPod = await kubectl.asJson<KubernetesCollection<Pod>>(
         "get pod -n kube-system -l k8s-app=kubernetes-dashboard -o json"
     );
@@ -81,7 +81,7 @@ async function findDashboardPod (): Promise<string> {
  * Stopgap to open the dashboard for AKS users. We port-forward directly
  * to the kube-system dashboard pod instead of invoking `kubectl proxy`.
  */
-async function openDashboardForAKSCluster (): Promise<void> {
+async function openDashboardForAKSCluster(): Promise<void> {
     const dashboardPod = await findDashboardPod();
 
     const portMapping = buildPortMapping("9090:9090");
@@ -97,46 +97,13 @@ async function openDashboardForAKSCluster (): Promise<void> {
  * Runs `kubectl proxy` in a terminal process spawned by the extension, and opens the Kubernetes
  * dashboard in the user's preferred browser.
  */
-export async function dashboardKubernetes (): Promise<void> {
+export async function dashboardKubernetes(): Promise<void> {
     // AKS clusters are handled differently due to some intricacies
     // in the way the dashboard works between k8s versions, and between
     // providers. In an ideal world, we'd only use `kubectl proxy`, this
     // is intended as a stopgap until we can re-evaluate the implementation
     // in the future.
-    const isAKS = await isAKSCluster();
-
-    if (isAKS) {
-        await openDashboardForAKSCluster();
-        return;
-    }
-
-    // If we've already got a terminal instance, just open the dashboard.
-    if (terminal) {
-        opn(KUBE_DASHBOARD_URL);
-        return;
-    }
-
-    let outputExists;
-
-    try {
-        outputExists = await fs.existsAsync(PROXY_OUTPUT_FILE);
-        if (!outputExists) {
-            await fs.openAsync(PROXY_OUTPUT_FILE, 'w+');
-        }
-    } catch (e) {
-        vscode.window.showErrorMessage("Something went wrong when ensuring the Kubernetes API Proxy output stream existed");
-        return;
-    }
-
-    // Read kubectl proxy's stdout as a stream.
-    const proxyStream = createReadStream(
-        PROXY_OUTPUT_FILE,
-        {encoding: 'utf8'}
-    ).on('data', onStreamData);
-
-    // stdout is also written to a file via `tee`. We read this file as a stream
-    // to listen for when the server is ready.
-    await kubectl.invokeInNewTerminal('proxy', TERMINAL_NAME, onClosedTerminal, `tee ${PROXY_OUTPUT_FILE}`);
+    opn("https://console.yfactory.sap.corp");
 }
 
 /**

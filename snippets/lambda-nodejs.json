@@ -1,0 +1,13 @@
+{
+    "Kyma Lambda": {
+        "prefix": "kyma-vscode-lambda",
+        "body": [
+            "module.exports = {",
+            "main: function (event, context) {",
+            "return \"${1:hello Kyma}\";",
+            "}",
+            "}"
+        ],
+        "description": "snippet for kyma lambda"
+    }
+}

@@ -12,7 +12,9 @@ export interface ObjectMeta {
     readonly namespace?: string;
     readonly labels?: KeyValuePairs;
 }
-
+export interface ObjectStatus {
+    readonly phase: string;
+}
 export interface KeyValuePairs {
     readonly [key: string]: string;
 }
@@ -22,6 +24,7 @@ export interface DataResource extends KubernetesResource {
 }
 
 export interface Namespace extends KubernetesResource {
+    readonly status: ObjectStatus;
 }
 
 export interface Container {

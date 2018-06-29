@@ -4,6 +4,7 @@ import { kubeChannel } from "./kubeChannel";
 import { sleep } from "./sleep";
 import { ObjectMeta, KubernetesCollection, DataResource, Namespace, Pod, KubernetesResource } from './kuberesources.objectmodel';
 import { failed } from "./errorable";
+import { deleteMessageItems } from "./extension";
 
 export interface Cluster {
     readonly name: string;
@@ -119,12 +120,14 @@ export async function getNamespaces(kubectl: Kubectl): Promise<NamespaceInfo[]> 
         return [];
     }
     const currentNS = await currentNamespace(kubectl);
-    return ns.result.items.map((item) => {
-        return {
-            name: item.metadata.name,
-            active: item.metadata.name === currentNS
-        };
-    });
+    return ns.result.items.filter((item) =>
+        "labels" in item.metadata && "env" in item.metadata.labels && item.status.phase === "Active") //FIXME: we will add active .status.phase
+        .map((item) => {
+            return {
+                name: item.metadata.name,
+                active: item.metadata.name === currentNS
+            };
+        });
 }
 
 export async function getServices(kubectl: Kubectl): Promise<PodSelector[]> {
@@ -227,9 +230,9 @@ export async function switchNamespace(kubectl: Kubectl, namespace: string): Prom
  */
 export async function runAsDeployment(kubectl: Kubectl, deploymentName: string, image: string, exposedPorts: number[], env: any): Promise<string> {
     let imageName = image.split(":")[0];
-    let imagePrefix = imageName.substring(0, imageName.lastIndexOf("/")+1);
+    let imagePrefix = imageName.substring(0, imageName.lastIndexOf("/") + 1);
     if (!deploymentName) {
-        let baseName = imageName.substring(imageName.lastIndexOf("/")+1);
+        let baseName = imageName.substring(imageName.lastIndexOf("/") + 1);
         const deploymentName = `${baseName}-${Date.now()}`;
     }
     let runCmd = [

@@ -101,14 +101,16 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesWorkloadFolder(),
             new KubernetesServiceFolder(),
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
-            new KubernetesConfigFolder()
+
+            new KubernetesDataHolderFolder(kuberesources.allKinds.secret),
+            new KubernetesDataHolderFolder(kuberesources.allKinds.lambda)
         ];
     }
 
     getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
         const treeItem = new vscode.TreeItem(this.id, vscode.TreeItemCollapsibleState.Collapsed);
         treeItem.contextValue = "vsKubernetes.cluster";
-        treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/k8s-logo.png"));
+        treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/Kyma-Icon.svg"));
         if (!this.metadata.active) {
             treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
             treeItem.contextValue += ".inactive";
@@ -144,18 +146,7 @@ class KubernetesWorkloadFolder extends KubernetesFolder {
     }
 }
 
-class KubernetesConfigFolder extends KubernetesFolder {
-    constructor() {
-        super("config", "Configuration");
-    }
 
-    getChildren(kubectl: Kubectl, host: Host): vscode.ProviderResult<KubernetesObject[]> {
-        return [
-            new KubernetesDataHolderFolder(kuberesources.allKinds.configMap),
-            new KubernetesDataHolderFolder(kuberesources.allKinds.secret)
-        ];
-    }
-}
 
 class KubernetesResourceFolder extends KubernetesFolder {
     constructor(readonly kind: kuberesources.ResourceKind) {

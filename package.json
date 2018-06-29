@@ -62,7 +62,8 @@
         "onView:extension.vsKubernetesExplorer",
         "onLanguage:helm",
         "onLanguage:yaml",
-        "onDebug"
+        "onDebug",
+        "onCommand:extension.deployToKyma"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -137,7 +138,7 @@
                 {
                     "icon": "images/logo.svg",
                     "id": "kubernetesView",
-                    "title": "Kubernetes"
+                    "title": "Kyma"
                 }
             ]
         },
@@ -210,6 +211,16 @@
                     "command": "extension.vsKubernetesUseNamespace",
                     "group": "0",
                     "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.resource.namespace.inactive"
+                },
+                {
+                    "command": "extension.deleteEnvironment",
+                    "group": "0",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.resource.namespace.inactive"
+                },
+                {
+                    "command": "extension.addNewEnvironment",
+                    "group": "0",
+                    "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.cluster"
                 },
                 {
                     "command": "extension.vsKubernetesCopy",
@@ -533,9 +544,19 @@
                 "category": "Kubernetes"
             },
             {
+                "command": "extension.addNewEnvironment",
+                "title": "Add new Environment",
+                "category": "Kyma"
+            },
+            {
+                "command": "extension.deleteEnvironment",
+                "title": "Delete Environment",
+                "category": "Kyma"
+            },
+            {
                 "command": "extension.vsKubernetesDashboard",
-                "title": "Open Dashboard",
-                "category": "Kubernetes"
+                "title": "Open Console",
+                "category": "Kyma-Kubernetes"
             },
             {
                 "command": "extension.vsKubernetesPortForward",
@@ -637,6 +658,12 @@
                 "title": "Create Chart",
                 "description": "Create a new Helm Chart",
                 "category": "Helm"
+            },
+            {
+                "command": "extension.deployToKyma",
+                "title": "Deploy to Kyma",
+                "description": "Deploy the lambda function to Kyma",
+                "category": "Kyma"
             }
         ],
         "languages": [
@@ -680,6 +707,10 @@
             {
                 "language": "helm",
                 "path": "./snippets/helm.json"
+            },
+            {
+                "language": "javascript",
+                "path": "./snippets/lambda-nodejs.json"
             }
         ],
         "debuggers": [

@@ -103,7 +103,8 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
 
             new KubernetesDataHolderFolder(kuberesources.allKinds.secret),
-            new KubernetesDataHolderFolder(kuberesources.allKinds.lambda)
+            new KubernetesDataHolderFolder(kuberesources.allKinds.lambda),
+            new KubernetesDataHolderFolder(kuberesources.allKinds.api)
         ];
     }
 

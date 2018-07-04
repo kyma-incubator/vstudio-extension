@@ -20,7 +20,8 @@ export const allKinds = {
     configMap: new ResourceKind("ConfigMap", "ConfigMaps", "configmap"),
     secret: new ResourceKind("Secret", "Secrets", "secret"),
     ingress: new ResourceKind("Ingress", "Ingress", "ingress"),
-    lambda: new ResourceKind("Lambda", "Lambdas", "configmap")
+    lambda: new ResourceKind("Lambda", "Lambdas", "configmap"),
+    api: new ResourceKind("Api", "Apis", "api")
 };
 
 export const commonKinds = [

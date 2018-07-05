@@ -60,6 +60,7 @@ import { KubernetesResourceVirtualFileSystemProvider, K8S_RESOURCE_SCHEME } from
 import { Container, isPod, isKubernetesResource, KubernetesCollection, Pod, KubernetesResource } from './kuberesources.objectmodel';
 import { LambdaActions } from './kyma/LambdaActions';
 import * as kyma from './kyma/kymaActions';
+import { provideHoverYamlKyma } from "./kyma/hoverHelper";
 let explainActive = false;
 let swaggerSpecPromise = null;
 
@@ -199,10 +200,12 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
             { language: 'json', scheme: 'file' },
             { provideHover: provideHoverJson }
         ),
+
         vscode.languages.registerHoverProvider(
             { language: 'yaml', scheme: 'file' },
-            { provideHover: provideHoverYaml }
+            { provideHover: provideHoverYamlKyma }
         ),
+
         vscode.languages.registerHoverProvider(HELM_MODE, new HelmTemplateHoverProvider()),
 
         // Tree data providers
@@ -348,13 +351,13 @@ function provideHover(document, position, token, syntax): Promise<vscode.Hover> 
         if (field === 'kind') {
             field = '';
         }
-
         explain(obj, field).then(
             (msg: string) => resolve(new vscode.Hover(msg))
         );
     });
 
 }
+
 
 function provideHoverJson(document, position, token) {
     const syntax = {

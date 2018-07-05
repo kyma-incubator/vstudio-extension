@@ -1,0 +1,16 @@
+name: Api
+label: Kyma Api
+description: Kyma Api Deployment
+body: |2
+  apiVersion: gateway.kyma.cx/v1alpha2
+  kind: Api
+  metadata:
+    labels:
+      function: ${1:functionName}
+      example: serverless-lambda
+    name: ${1:functionName}
+  spec:
+    hostname: ${2:route}.yfactory.sap.corp
+    service:
+      name: ${1:functionName}
+      port: ${3:8080}

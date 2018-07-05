@@ -51,11 +51,11 @@ export class LambdaActions {
 
     private async lookForDeps() {
         return ""; //FIXME: remove this line   !!!!!!! HOW DO WE GET DEPS ?????
-        const jsonFile = await vscode.workspace.findFiles("package.json");
+        /*const jsonFile = await vscode.workspace.findFiles("package.json");
         if (!jsonFile || jsonFile.length === 0) {
             return "";
         }
-        return "package.json";
+        return "package.json";*/
     }
 
 

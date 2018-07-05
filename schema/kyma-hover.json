@@ -1,0 +1,17 @@
+{
+    "apiVersion": "Api version of the kyma. You can look for other api formats in https://kyma.com",
+    "kind": "Kind defines the service type you want to deploy. \n\n **API** exposes your services to internet \n\n **Deployment** creates a new deployment",
+    "labels": "labels for you API",
+    "function": "Name of the function in the lambda section.",
+    "spec": "Specs for your funcs",
+    "hostname": "The endpoint of your API",
+    "service": {
+        "name": "Name of the  service your API Exposes",
+        "description": "Info about the service your API exposes"
+    },
+    "port": "Connection port between your deployment and your service",
+    "metadata": {
+        "name": "Name of the API",
+        "description": "Extra info to add your API"
+    }
+}

@@ -206,6 +206,7 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
             { provideHover: provideHoverYamlKyma }
         ),
 
+        vscode.workspace.getConfiguration().update("yaml.schemas", { "http://localhost:8080/": "*.yaml" }, vscode.ConfigurationTarget.Workspace), //KYMA config
         vscode.languages.registerHoverProvider(HELM_MODE, new HelmTemplateHoverProvider()),
 
         // Tree data providers
@@ -294,7 +295,8 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
     subscriptions.forEach((element) => {
         context.subscriptions.push(element);
     }, this);
-    await registerYamlSchemaSupport();
+
+
     vscode.workspace.registerTextDocumentContentProvider(configmaps.uriScheme, configMapProvider);
     return {
         apiVersion: '0.1',

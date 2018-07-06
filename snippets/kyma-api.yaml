@@ -1,5 +1,5 @@
-name: Api
-label: Kyma Api
+name: Kyma-Api
+label: Kyma-Api
 description: Kyma Api Deployment
 body: |2
   apiVersion: gateway.kyma.cx/v1alpha2

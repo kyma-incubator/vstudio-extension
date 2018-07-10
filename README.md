@@ -25,11 +25,12 @@
 ## Roadmap
 
 - [x] Kyma Logo  
-- [x] See my Kyma deployments
+- [x] See Kyma Resources
     - [x] Lambdas
     - [x] Apis
     - [x] Deployments
     - [x] Services
+    - [x] Remote Environments
 - [x] Hovering to function keyword reveals currently running functions.
 - [x] Learn about Kyma Deployment files
 - [x] Provide schema validation for Kyma deployment files

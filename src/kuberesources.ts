@@ -21,7 +21,8 @@ export const allKinds = {
     secret: new ResourceKind("Secret", "Secrets", "secret"),
     ingress: new ResourceKind("Ingress", "Ingress", "ingress"),
     lambda: new ResourceKind("Lambda", "Lambdas", "configmap"),
-    api: new ResourceKind("Api", "Apis", "api")
+    api: new ResourceKind("Api", "Apis", "api"),
+    remoteenvironment: new ResourceKind("Remote Environment", "Remote Environments", "remoteenvironment")
 };
 
 export const commonKinds = [

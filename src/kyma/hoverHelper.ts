@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import { fs } from '../fs';
-
-export function provideHoverYamlKyma(document: vscode.TextDocument, position: vscode.Position, token): Promise<vscode.Hover> {
+import { Kubectl } from "../kubectl";
+import * as kubectlUtils from "../kubectlUtils";
+import * as yaml from "js-yaml";
+/*
+async function provideHoverYamlKyma(document: vscode.TextDocument, position: vscode.Position, token): Promise<vscode.Hover> {
     const line = document.lineAt(position.line);
     const ix = line.text.indexOf(":");
     const propertyName = line.text.substring(line.firstNonWhitespaceCharacterIndex, ix);
@@ -17,13 +18,24 @@ export function provideHoverYamlKyma(document: vscode.TextDocument, position: vs
     jsonFile = JSON.parse(jsonFile);
     let msg: string;
 
-    if (propertyName == "name") {
+    if (propertyName == "function") {
         const parentLinePos = findParentYaml(document, position.line);
         const parentLine = document.lineAt(parentLinePos);
 
         const pix = parentLine.text.indexOf(":");
 
         const parentPropertyName = parentLine.text.substring(parentLine.firstNonWhitespaceCharacterIndex, pix);
+        if (parentPropertyName == "metadata") {
+            console.log("Checking that function");
+            msg = "Your Functions\n";
+
+            const functions = await kubectlUtils.getDataHolders("configmaps", kubectl);
+            functions.forEach((cm) => { msg += cm.metadata.name + "\n"; });
+
+
+            return new vscode.Hover(msg);
+        }
+
         console.log(parentPropertyName);
         // const parentProperty = document.lineAt(parent).text.indexOf(":");
         if (!jsonFile[parentPropertyName][propertyName]) {
@@ -43,11 +55,40 @@ export function provideHoverYamlKyma(document: vscode.TextDocument, position: vs
     }
 
 
-    return new Promise(async (resolve) => {
-        resolve(new vscode.Hover(msg));
-    });
-}
+    /* return new Promise(async (resolve) => {
+         resolve(new vscode.Hover(msg));
+     });
+    return new vscode.Hover(msg);
+}*/
+export function MyHover(kubectl: Kubectl) {
 
+    vscode.languages.registerHoverProvider(
+        { language: 'yaml', scheme: 'file' },
+        {
+            async provideHover(document, position, token) {
+
+                const docObj = yaml.safeLoad(document.getText());
+                console.log(docObj);
+                if (docObj["apiVersion"] == "kubeless.io/v1beta1") return;
+                let msg: string;
+                const line = document.lineAt(position.line);
+                const ix = line.text.indexOf(":");
+                const propertyName = line.text.substring(line.firstNonWhitespaceCharacterIndex, ix);
+                console.log(propertyName);
+                if (propertyName == "function") {
+                    msg = "**Your functions:** \n\n";
+                    const functions = await kubectlUtils.getDataHolders("configmaps", kubectl);
+                    functions.forEach((cm) => {
+                        msg += cm.metadata.name + "\n\n";
+                    });
+
+                    return new vscode.Hover(msg);
+                }
+
+            }
+        }
+    );
+}
 function findParentYaml(document, line): vscode.Position {
     let indent = yamlIndentLevel(document.lineAt(line).text);
     while (line >= 0) {

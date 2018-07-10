@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import { currentNamespace } from '../kubectlUtils';
@@ -24,11 +23,36 @@ export class LambdaActions {
         },
 
     };
+    private apiConf = {
+        apiVersion: "gateway.kyma.cx/v1alpha2",
+        kind: "Api",
+        metadata: {
 
+
+            labels: {
+                deployedBy: "vscode",
+                function: "",
+            },
+            name: "",
+
+        },
+        spec: {
+            hostname: "",
+            service: {
+                name: "",
+                port: 8080,
+            }
+        },
+    };
     async deployToKyma(editor: vscode.TextEditor, kubectl: Kubectl) {
 
         console.log("running lambda to kyma");
         this.deployConf.spec.runtime = editor.document.languageId === "javascript" ? "nodejs8" : "any";
+
+        if (this.deployConf.spec.runtime === "any") {
+            vscode.window.showErrorMessage("Not a javascript file, Aborting...");
+            return;
+        }
 
         this.deployConf.spec.function = editor.document.getText().replace(/(\r\n\t|\n|\r\t)/gm, "");
 
@@ -43,12 +67,35 @@ export class LambdaActions {
 
         const namespace = await currentNamespace(kubectl);
 
-
+        if (namespace === "default") {
+            vscode.window.showWarningMessage("You can't deploy to default, select a Kyma environment.");
+            return;
+        }
         await kubectl.invokeInNewTerminal(`apply -f ${workspacePath} -n ${namespace}`, "kubectl");
+
 
 
     }
 
+    async exposeLambda(kubectl: Kubectl) {
+        console.log("Exposing lambda");
+
+        this.apiConf.metadata.labels.function = this.deployConf.metadata.name;
+        this.apiConf.metadata.name = this.deployConf.metadata.name;
+        this.apiConf.spec.hostname = this.deployConf.metadata.name + ".yfactory.sap.corp";
+        this.apiConf.spec.service.name = this.deployConf.metadata.name;
+
+        const workspacePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "api-without-auth.yaml");
+        fs.writeFileSync(workspacePath, yaml.safeDump(this.apiConf), { encoding: "utf8", flag: "w" });
+
+        const namespace = await currentNamespace(kubectl);
+        if (namespace == "default") {
+            vscode.window.showWarningMessage("You can't deploy to default, select a kyma environment");
+            return;
+        }
+        await kubectl.invokeInNewTerminal(`apply -f ${workspacePath} -n ${namespace}`, "kubectl");
+
+    }
     private async lookForDeps() {
         return ""; //FIXME: remove this line   !!!!!!! HOW DO WE GET DEPS ?????
         /*const jsonFile = await vscode.workspace.findFiles("package.json");

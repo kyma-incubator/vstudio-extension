@@ -1,10 +1,10 @@
 {
-    "name": "vscode-kubernetes-tools",
-    "displayName": "Kubernetes",
-    "description": "Develop, deploy and debug Kubernetes applications",
-    "version": "0.1.10",
+    "name": "vscode-kyma-tools",
+    "displayName": "Kyma",
+    "description": "Develop, deploy and debug Kyma applications",
+    "version": "0.0.1",
     "preview": true,
-    "publisher": "ms-kubernetes-tools",
+    "publisher": "hybris-kyma-tools",
     "engines": {
         "vscode": "^1.23.0"
     },
@@ -63,7 +63,9 @@
         "onLanguage:helm",
         "onLanguage:yaml",
         "onDebug",
-        "onCommand:extension.deployToKyma"
+        "onCommand:extension.deployToKyma",
+        "onCommand:extension.installKyma",
+        "onCommand:extension.addServiceInstance"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -214,7 +216,7 @@
                 },
                 {
                     "command": "extension.deleteEnvironment",
-                    "group": "0",
+                    "group": "1",
                     "when": "view == extension.vsKubernetesExplorer && viewItem == vsKubernetes.resource.namespace.inactive"
                 },
                 {
@@ -664,6 +666,24 @@
                 "title": "Deploy to Kyma",
                 "description": "Deploy the lambda function to Kyma",
                 "category": "Kyma"
+            },
+            {
+                "command": "extension.exposeLambda",
+                "title": "Expose Lambda",
+                "description": "Expose your lambda func to internet",
+                "category": "Kyma"
+            },
+            {
+                "command": "extension.installKyma",
+                "title": "Install Kyma",
+                "description": "Install Lambda to Minikube",
+                "category": "Kyma"
+            },
+            {
+                "command": "extension.addServiceInstance",
+                "title": "Deploy Service Instance to Kyma",
+                "description": "Deploy service Instance to Kyma",
+                "category": "Kyma"
             }
         ],
         "languages": [
@@ -853,7 +873,7 @@
         "mocha": "^4.1.0",
         "tslint": "^5.9.1",
         "typescript": "^2.2.32",
-        "vscode": "^1.0.17"
+        "vscode": "^1.1.18"
     },
     "repository": {
         "type": "git",

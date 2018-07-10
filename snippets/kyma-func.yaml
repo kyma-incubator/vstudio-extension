@@ -1,0 +1,17 @@
+name: Kyma-Func
+label: Kyma-Func
+description: Kyma Function Deployment
+body: |2
+  apiVersion: kubeless.io/v1beta1
+  kind: Function
+  metadata:
+    name: ${1: myFuncName}
+    labels:
+      deployedBy: vscode
+  
+  spec:
+    deps: ""
+    function: "module.exports = {\r    main: function (event, context) {\r        return \"hello world\";\r    }\r}"
+    runtime: nodejs8
+    type: HTTP
+    handler: handler.main

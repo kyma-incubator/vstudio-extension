@@ -1,0 +1,73 @@
+{
+    "id": "kubeless",
+    "title": "kubeless",
+    "description": "Kyma deployment description",
+    "type": "object",
+    "required": [
+        "apiVersion",
+        "kind",
+        "metadata",
+        "spec"
+    ],
+    "properties": {
+        "apiVersion": {
+            "type": "string",
+            "description": "This Defines your api Version. \n\n To learn more, visit http://wiki.hybris.com"
+        },
+        "kind": {
+            "type": "string",
+            "description": "What kind of resource are you deploying ? \n\n  Options are: Function , Deployment, Service, Api"
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Label your resources for better accesibility",
+            "required": [
+                "labels",
+                "name"
+            ],
+            "properties": {
+                "labels": {
+                    "type": "object",
+                    "description": "Label your resources for better accesibility"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of your lambda function"
+                }
+            }
+        },
+        "spec": {
+            "type": "object",
+            "description": "Specs of your deployment",
+            "required": [
+                "deps",
+                "function",
+                "runtime",
+                "type",
+                "handler"
+            ],
+            "properties": {
+                "deps": {
+                    "type": "string",
+                    "description": "Name of your package dependencies. Read from *package.json*"
+                },
+                "function": {
+                    "type": "string",
+                    "description": "Your main logic"
+                },
+                "runtime": {
+                    "type": "string",
+                    "description": "Runtime of your function"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Type of your function trigger. It is either *HTTP* or *Event*"
+                },
+                "handler": {
+                    "type": "string",
+                    "description": "Main handler for your func. It is mostly **handler.main**"
+                }
+            }
+        }
+    }
+}

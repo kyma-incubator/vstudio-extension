@@ -60,7 +60,8 @@ import { KubernetesResourceVirtualFileSystemProvider, K8S_RESOURCE_SCHEME } from
 import { Container, isPod, isKubernetesResource, KubernetesCollection, Pod, KubernetesResource } from './kuberesources.objectmodel';
 import { LambdaActions } from './kyma/LambdaActions';
 import * as kyma from './kyma/kymaActions';
-import { provideHoverYamlKyma } from "./kyma/hoverHelper";
+import { MyHover } from "./kyma/hoverHelper";
+import { accessSync } from 'fs';
 let explainActive = false;
 let swaggerSpecPromise = null;
 
@@ -174,6 +175,7 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
 
         //Commands - Kyma
         vscode.commands.registerTextEditorCommand("extension.deployToKyma", (editor) => lambdaActionsProvider.deployToKyma(editor, kubectl)),
+        registerCommand("extension.exposeLambda", async () => { await lambdaActionsProvider.exposeLambda(kubectl); }),
         registerCommand("extension.addNewEnvironment", async () => { await kyma.createNewEnvironment(); refreshExplorer(); }),
         registerCommand("extension.deleteEnvironment", async (explorerItem) => {
             await kyma.deleteEnvironment(kubectl, explorerItem);
@@ -181,7 +183,8 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
                 refreshExplorer();
             }, 1000);
         }),
-
+        registerCommand("extension.installKyma", kyma.installKyma), //FIXME: implement it
+        registerCommand("extension.addServiceInstance", kyma.addServiceInstance),
         // Draft debug configuration provider
         vscode.debug.registerDebugConfigurationProvider('draft', draftDebugProvider),
 
@@ -201,12 +204,10 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
             { provideHover: provideHoverJson }
         ),
 
-        vscode.languages.registerHoverProvider(
-            { language: 'yaml', scheme: 'file' },
-            { provideHover: provideHoverYamlKyma }
-        ),
+        MyHover(kubectl),
 
-        vscode.workspace.getConfiguration().update("yaml.schemas", { "http://localhost:8080/": "*.yaml" }, vscode.ConfigurationTarget.Workspace), //KYMA config
+
+        // vscode.workspace.getConfiguration().update("yaml.schemas", { "http://localhost:8080/": "*.yaml" }, vscode.ConfigurationTarget.Workspace), //KYMA config
         vscode.languages.registerHoverProvider(HELM_MODE, new HelmTemplateHoverProvider()),
 
         // Tree data providers
@@ -297,6 +298,7 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
     }, this);
 
 
+    await registerYamlSchemaSupport();
     vscode.workspace.registerTextDocumentContentProvider(configmaps.uriScheme, configMapProvider);
     return {
         apiVersion: '0.1',

@@ -11,24 +11,37 @@
     ],
     "properties": {
         "apiVersion": {
-            "type": "string"
+            "type": "string",
+            "description": "Defines your api Version. \n\n To learn more, visit http://wiki.hybris.com"
         },
         "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "What kind of resource are you deploying ? \n\n  Options are: Function , Deployment, Service, Api"
         },
         "metadata": {
             "type": "object",
+            "description": "Metadata of your deployment",
+            "required": [
+                "labels",
+                "name"
+            ],
             "properties": {
                 "labels": {
                     "type": "object",
+                    "description": "Label your resources for better accesibility",
+                    "required": [
+                        "function"
+                    ],
                     "properties": {
                         "function": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Name of your resource"
                         }
                     }
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Name of your lambda function"
                 }
             }
         },
@@ -40,13 +53,20 @@
             ],
             "properties": {
                 "hostname": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Route to access your lambda function"
                 },
                 "service": {
                     "type": "object",
+                    "description": "Connection service between lambda and internet",
+                    "required": [
+                        "port",
+                        "name"
+                    ],
                     "properties": {
                         "name": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Name of your service"
                         },
                         "port": {
                             "type": "number",

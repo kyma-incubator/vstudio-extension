@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import Uri from 'vscode-uri';
 import * as vscode from 'vscode';
 import { yamlLocator, YamlMap } from "./yaml-locator";
 import {
@@ -25,8 +24,8 @@ export interface KubernetesSchema {
 // 2. the requestSchemaContent api  will give the parameter uri returned by the first api, and ask for the json content(after stringify) of
 // the schema
 declare type YamlSchemaContributor = (schema: string,
-                                       requestSchema: (resource: string) => string,
-                                       requestSchemaContent: (uri: string) => string) => void;
+    requestSchema: (resource: string) => string,
+    requestSchemaContent: (uri: string) => string) => void;
 
 class KubernetesSchemaHolder {
     // the schema for kubernetes
@@ -43,7 +42,7 @@ class KubernetesSchemaHolder {
             this.saveSchemaWithManifestStyleKeys(name, definitions[name]);
         }
 
-        for (const schema of _.values(this._definitions) ) {
+        for (const schema of _.values(this._definitions)) {
             if (schema.properties) {
                 // the swagger schema has very short description on properties, we need to get the actual type of
                 // the property and provide more description/properties details, just like `kubernetes explain` do.
@@ -89,7 +88,7 @@ class KubernetesSchemaHolder {
     private saveSchemaWithManifestStyleKeys(name: string, originalSchema: any): void {
         if (isGroupVersionKindStyle(originalSchema)) {
             // if the schema contains 'x-kubernetes-group-version-kind'. then it is a direct kubernetes manifest,
-            getManifestStyleSchemas(originalSchema).forEach((schema: KubernetesSchema) =>  {
+            getManifestStyleSchemas(originalSchema).forEach((schema: KubernetesSchema) => {
                 this.saveSchema({
                     name,
                     ...schema
@@ -181,15 +180,20 @@ export async function registerYamlSchemaSupport(): Promise<void> {
         return;
     }
     // register for kubernetes schema provider
-    yamlPlugin.registerContributor(KUBERNETES_SCHEMA, requestYamlSchemaUriCallback,  requestYamlSchemaContentCallback);
+    // yamlPlugin.registerContributor(KUBERNETES_SCHEMA, requestYamlSchemaUriCallback, requestYamlSchemaContentCallback);
+    yamlPlugin.registerContributor("kyma", getKymaUrl, (uri: string) => { console.log(uri); });
+    console.log(yamlPlugin);
 }
 
-// see docs from YamlSchemaContributor
-function requestYamlSchemaUriCallback(resource: string): string {
+
+
+function getKymaUrl(resource: string): string {
+    console.log(resource);
     const textEditor = vscode.window.visibleTextEditors.find((editor) => editor.document.uri.toString() === resource);
     if (textEditor) {
         const yamlDocs = yamlLocator.getYamlDocuments(textEditor.document);
         const choices: string[] = [];
+        let url: string;
         yamlDocs.forEach((doc) => {
             // if the yaml document contains apiVersion and kind node, it will report it is a kubernetes yaml
             // file
@@ -197,44 +201,24 @@ function requestYamlSchemaUriCallback(resource: string): string {
             if (topLevelMapping) {
                 // if the overall yaml is an map, find the apiVersion and kind properties in yaml
                 const apiVersion = util.getYamlMappingValue(topLevelMapping, 'apiVersion');
-                const kind = util.getYamlMappingValue(topLevelMapping, 'kind');
-                if (apiVersion && kind) {
-                    choices.push(apiVersion + GROUP_VERSION_KIND_SEPARATOR + kind);
+
+                if (apiVersion) {
+                    if (apiVersion === "gateway.kyma.cx/v1alpha2") {
+                        console.log("api");
+                        url = "http://localhost:8080/?schema=api";
+                    }
+                    else if (apiVersion == "kubeless.io/v1beta1") {
+                        console.log("kubeless");
+                        url = "http://localhost:8080/?schema=kubeless";
+                    }
                 }
             }
         });
-        return util.makeKubernetesUri(choices);
+        console.log("selam");
+        return url;
     }
 }
 
-// see docs from YamlSchemaContributor
-function requestYamlSchemaContentCallback(uri: string): string {
-    const _uri = Uri.parse(uri);
-    if (_uri.scheme !== KUBERNETES_SCHEMA) {
-        return undefined;
-    }
-    if (!_uri.path || !_uri.path.startsWith('/')) {
-        return undefined;
-    }
-
-    // slice(1) to remove the first '/' in schema
-    // eg: kubernetes://schema/io.k8s.kubernetes.pkg.apis.extensions.v1beta1.httpingresspath will have
-    // path '/io.k8s.kubernetes.pkg.apis.extensions.v1beta1.httpingresspath'
-    const manifestType = _uri.path.slice(1);
-    // if it is a multiple choice, make an 'oneof' schema.
-    if (manifestType.includes('+')) {
-        const manifestRefList = manifestType.split('+').map(util.makeRefOnKubernetes);
-        return JSON.stringify({ oneOf: manifestRefList });
-    }
-    const schema = kubeSchema.lookup(manifestType);
-
-    // convert it to string since vscode-yaml need the string format
-    if (schema) {
-        return JSON.stringify(schema);
-    }
-    return undefined;
-
-}
 
 /**
  * Tell whether or not the swagger schema is a kubernetes manifest schema, a kubernetes manifest schema like Service
@@ -281,7 +265,7 @@ function getManifestStyleSchemas(originalSchema: any): KubernetesSchema[] {
 
 // convert '#/definitions/com.github.openshift.origin.pkg.build.apis.build.v1.ImageLabel' to
 // 'com.github.openshift.origin.pkg.build.apis.build.v1.ImageLabel'
-function getNameInDefinitions ($ref: string): string {
+function getNameInDefinitions($ref: string): string {
     const prefix = '#/definitions/';
     if ($ref.startsWith(prefix)) {
         return $ref.slice(prefix.length);
@@ -292,7 +276,7 @@ function getNameInDefinitions ($ref: string): string {
 
 
 // find redhat.vscode-yaml extension and try to activate it to get the yaml contributor
-async function activateYamlExtension(): Promise<{registerContributor: YamlSchemaContributor}> {
+async function activateYamlExtension(): Promise<{ registerContributor: YamlSchemaContributor }> {
     const ext: vscode.Extension<any> = vscode.extensions.getExtension(VSCODE_YAML_EXTENSION_ID);
     if (!ext) {
         vscode.window.showWarningMessage('Please install \'YAML Support by Red Hat\' via the Extensions pane.');
@@ -306,4 +290,3 @@ async function activateYamlExtension(): Promise<{registerContributor: YamlSchema
     }
     return yamlPlugin;
 }
-

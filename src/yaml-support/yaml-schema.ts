@@ -1,12 +1,17 @@
 import * as _ from 'lodash';
 import * as vscode from 'vscode';
 import { yamlLocator, YamlMap } from "./yaml-locator";
+import * as http from 'http';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as url from 'url';
 import {
     VSCODE_YAML_EXTENSION_ID, KUBERNETES_SCHEMA, KUBERNETES_GROUP_VERSION_KIND, GROUP_VERSION_KIND_SEPARATOR,
     KUBERNETES_SCHEMA_FILE, KUBERNETES_SCHEMA_ENUM_FILE
 } from "./yaml-constant";
 import * as util from "./yaml-util";
 import { formatComplex, formatOne, formatType } from '../schema-formatting';
+import { PassThrough } from 'stream';
 
 export interface KubernetesSchema {
     readonly name: string;
@@ -26,7 +31,7 @@ export interface KubernetesSchema {
 declare type YamlSchemaContributor = (schema: string,
     requestSchema: (resource: string) => string,
     requestSchemaContent: (uri: string) => string) => void;
-
+const PORT = vscode.workspace.getConfiguration("vs-kubernetes")["kyma.schema-server-port"];
 class KubernetesSchemaHolder {
     // the schema for kubernetes
     private _definitions: { [key: string]: KubernetesSchema; } = {};
@@ -172,7 +177,27 @@ class KubernetesSchemaHolder {
 
 const kubeSchema: KubernetesSchemaHolder = new KubernetesSchemaHolder();
 
+
+
+function startSchemaServer() {
+    const apiSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/kyma-schema.json"));
+    const kubelessSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/kubeless-schema.json"));
+
+    http.createServer((req, res) => {
+        const query = url.parse(req.url, true).query;
+        if (query.schema === "api") {
+            res.write(apiSchema);
+            res.end();
+        }
+        else if (query.schema === "kubeless") {
+            res.write(kubelessSchema);
+            res.end();
+        }
+    }).listen(PORT);
+    console.log(PORT);
+}
 export async function registerYamlSchemaSupport(): Promise<void> {
+    startSchemaServer();
     kubeSchema.loadSchema(KUBERNETES_SCHEMA_FILE, KUBERNETES_SCHEMA_ENUM_FILE);
     const yamlPlugin: any = await activateYamlExtension();
     if (!yamlPlugin || !yamlPlugin.registerContributor) {
@@ -205,11 +230,11 @@ function getKymaUrl(resource: string): string {
                 if (apiVersion) {
                     if (apiVersion === "gateway.kyma.cx/v1alpha2") {
                         console.log("api");
-                        url = "http://localhost:8080/?schema=api";
+                        url = `http://localhost:${PORT}/?schema=api`;
                     }
                     else if (apiVersion == "kubeless.io/v1beta1") {
                         console.log("kubeless");
-                        url = "http://localhost:8080/?schema=kubeless";
+                        url = `http://localhost:${PORT}/?schema=kubeless`;
                     }
                 }
             }

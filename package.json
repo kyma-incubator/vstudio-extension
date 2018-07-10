@@ -21,7 +21,7 @@
         "azure"
     ],
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
-    "icon": "images/k8s-logo.png",
+    "icon": "images/kyma-logo.png",
     "activationEvents": [
         "onCommand:extension.vsKubernetesCreate",
         "onCommand:extension.vsKubernetesDelete",
@@ -85,6 +85,10 @@
                             "type": "string",
                             "description": "File path to a kubectl binary."
                         },
+                        "kyma.schema-server-port": {
+                            "type": "number",
+                            "description": "port which schema server listens to"
+                        },
                         "vs-kubernetes.helm-path": {
                             "type": "string",
                             "description": "File path to a helm binary."
@@ -117,7 +121,8 @@
                         "vs-kubernetes.draft-path": "",
                         "vs-kubernetes.outputFormat": "yaml",
                         "vs-kubernetes.kubeconfig": "",
-                        "vs-kubernetes.autoCleanupOnDebugTerminate": false
+                        "vs-kubernetes.autoCleanupOnDebugTerminate": false,
+                        "kyma.schema-server-port": 4444
                     }
                 },
                 "vsdocker.imageUser": {

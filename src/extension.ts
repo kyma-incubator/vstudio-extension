@@ -213,6 +213,7 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
         // Tree data providers
         vscode.window.registerTreeDataProvider('extension.vsKubernetesExplorer', treeProvider),
 
+        kubectlUtils.switchNamespace(kubectl, "stage"),
         // Temporarily loaded resource providers
         vscode.workspace.registerFileSystemProvider(K8S_RESOURCE_SCHEME, resourceDocProvider, { /* TODO: case sensitive? */ }),
 

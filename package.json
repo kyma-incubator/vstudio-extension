@@ -21,7 +21,7 @@
         "azure"
     ],
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
-    "icon": "images/kyma-logo.png",
+    "icon": "images/Kyma-Logo-Symbol.jpg",
     "activationEvents": [
         "onCommand:extension.vsKubernetesCreate",
         "onCommand:extension.vsKubernetesDelete",

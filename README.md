@@ -47,9 +47,8 @@
 
 
 ---
-### Known Problems
-- Fix logo in extension preview page.
-- Currently Kyma does not identify "Api" as a resource. This is probably due to a bug 10.07.2018 built.
-
 ### Caveats
 - This extension creates a server that listens on port 4444. If you want to use that port number, change it in settings.
+
+### Known Problems
+- Check issues.

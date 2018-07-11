@@ -11,7 +11,6 @@ import {
 } from "./yaml-constant";
 import * as util from "./yaml-util";
 import { formatComplex, formatOne, formatType } from '../schema-formatting';
-import { PassThrough } from 'stream';
 
 export interface KubernetesSchema {
     readonly name: string;

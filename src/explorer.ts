@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import * as shell from './shell';
 import { Kubectl } from './kubectl';
 import * as kubectlUtils from './kubectlUtils';
 import { Host } from './host';
@@ -103,8 +102,8 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
 
             new KubernetesDataHolderFolder(kuberesources.allKinds.secret),
-            new KubernetesDataHolderFolder(kuberesources.allKinds.lambda),
-            new KubernetesDataHolderFolder(kuberesources.allKinds.api),
+            new KubernetesResourceFolder(kuberesources.allKinds.lambda),
+            new KubernetesResourceFolder(kuberesources.allKinds.api),
             new KubernetesDataHolderFolder(kuberesources.allKinds.remoteenvironment)
         ];
     }
@@ -193,10 +192,17 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
         treeItem.contextValue = `vsKubernetes.resource`;
         if (this.kind === kuberesources.allKinds.pod ||
             this.kind == kuberesources.allKinds.secret ||
-            this.kind == kuberesources.allKinds.configMap) {
+            this.kind == kuberesources.allKinds.lambda ||
+            this.kind == kuberesources.allKinds.api) {
             treeItem.contextValue = `vsKubernetes.resource.${this.kind.abbreviation}`;
             if (this.kind === kuberesources.allKinds.pod && this.metadata.status !== null) {
                 treeItem.iconPath = getIconForPodStatus(this.metadata.status);
+            } else if (this.kind === kuberesources.allKinds.lambda) {
+
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/y_blue_transparent.png"));
+            }
+            else if (this.kind === kuberesources.allKinds.api) {
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/api-icon.svg"));
             }
         }
         return treeItem;

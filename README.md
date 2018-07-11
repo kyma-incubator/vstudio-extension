@@ -1,5 +1,7 @@
 # Kyma VS Code Plugin
 
+![Kyma-tree-view](images/screenshots/kyma-tree-view.png)
+
 ## Installing
 - Download the released .vsix file. 
 - Go to extension in VS Code , click 3 dots and select install from vsix.
@@ -39,6 +41,10 @@
 - [ ] Install Kyma
 - [ ] Add Service Instance
     - [ ] Redis
+- [ ] Debugging for kubeless functions
+    - [ ] We can provide debugging for pods running the kubernetes functions. 
+    - [ ] Can we map it to kubeless .js files.
+
 
 ---
 ### Known Problems

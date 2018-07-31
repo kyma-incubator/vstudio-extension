@@ -61,7 +61,6 @@ import { Container, isPod, isKubernetesResource, KubernetesCollection, Pod, Kube
 import { LambdaActions } from './kyma/LambdaActions';
 import * as kyma from './kyma/kymaActions';
 import { MyHover } from "./kyma/hoverHelper";
-import { accessSync } from 'fs';
 let explainActive = false;
 let swaggerSpecPromise = null;
 
@@ -105,12 +104,13 @@ export const HELM_TPL_MODE: vscode.DocumentFilter = { language: "helm", scheme: 
 export async function activate(context): Promise<extensionapi.ExtensionAPI> {
     kubectl.checkPresent('activation');
 
+
     const treeProvider = explorer.create(kubectl, host);
     const resourceDocProvider = new KubernetesResourceVirtualFileSystemProvider(kubectl, host, vscode.workspace.rootPath);
     const previewProvider = new HelmTemplatePreviewDocumentProvider();
     const inspectProvider = new HelmInspectDocumentProvider();
     const completionProvider = new HelmTemplateCompletionProvider();
-    const lambdaActionsProvider = new LambdaActions();
+    const lambdaActionsProvider = new LambdaActions(kubectl);
     const completionFilter = [
         "helm",
         { pattern: "**/templates/NOTES.txt" }
@@ -183,8 +183,11 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
                 refreshExplorer();
             }, 1000);
         }),
+        registerCommand("extension.visualize", () => kyma.visualize(kubectl)),
         registerCommand("extension.installKyma", kyma.installKyma), //FIXME: implement it
         registerCommand("extension.addServiceInstance", kyma.addServiceInstance),
+        vscode.commands.registerTextEditorCommand("extension.debugLambda", (editor) => lambdaActionsProvider.debugLambda(editor)),
+
         // Draft debug configuration provider
         vscode.debug.registerDebugConfigurationProvider('draft', draftDebugProvider),
 

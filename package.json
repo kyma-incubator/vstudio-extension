@@ -2,7 +2,7 @@
     "name": "vscode-kyma-tools",
     "displayName": "Kyma",
     "description": "Develop, deploy and debug Kyma applications",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "preview": true,
     "publisher": "hybris-kyma-tools",
     "engines": {
@@ -65,7 +65,9 @@
         "onDebug",
         "onCommand:extension.deployToKyma",
         "onCommand:extension.installKyma",
-        "onCommand:extension.addServiceInstance"
+        "onCommand:extension.addServiceInstance",
+        "onCommand:extension.visualize",
+        "onCommand:extension.debugLambda"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -688,6 +690,16 @@
                 "command": "extension.addServiceInstance",
                 "title": "Deploy Service Instance to Kyma",
                 "description": "Deploy service Instance to Kyma",
+                "category": "Kyma"
+            },
+            {
+                "command": "extension.visualize",
+                "title": "Visualize Kyma",
+                "category": "Kyma"
+            },
+            {
+                "command": "extension.debugLambda",
+                "title": "Debug Lambda",
                 "category": "Kyma"
             }
         ],

@@ -4,7 +4,11 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import { currentNamespace } from '../kubectlUtils';
 import { Kubectl } from '../kubectl';
+import { shell } from '../shell';
+import { execPath } from '../binutil';
 export class LambdaActions {
+
+    constructor(private readonly kubectl: Kubectl) { }
     private deployConf = {
         apiVersion: "kubeless.io/v1beta1",
         kind: "Function",
@@ -44,9 +48,11 @@ export class LambdaActions {
             }
         },
     };
+    private output = vscode.window.createOutputChannel("kyma lambda");
+    private dc = vscode.languages.createDiagnosticCollection();
     async deployToKyma(editor: vscode.TextEditor, kubectl: Kubectl) {
 
-        console.log("running lambda to kyma");
+        console.log("deploying lambda to kyma");
         this.deployConf.spec.runtime = editor.document.languageId === "javascript" ? "nodejs8" : "any";
 
         if (this.deployConf.spec.runtime === "any") {
@@ -71,7 +77,7 @@ export class LambdaActions {
             vscode.window.showWarningMessage("You can't deploy to default, select a Kyma environment.");
             return;
         }
-        await kubectl.invokeInNewTerminal(`apply -f ${workspacePath} -n ${namespace}`, "kubectl");
+        await kubectl.invokeInSharedTerminal(`apply -f ${workspacePath} -n ${namespace}`);
 
 
 
@@ -106,6 +112,106 @@ export class LambdaActions {
     }
 
 
+
+    debugLambda(editor: vscode.TextEditor) {
+        const functionName = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
+        vscode.window.showInformationMessage("Running the debug command");
+        shell.exec("kubeless function call " + functionName).then(({ code, stdout, stderr }
+        ) => {
+            if (code == 1) { //means exited with error
+                //get logs and find error
+                this.kubectl.invoke("get " + "pod", (code, stdout, stderr) => {
+                    if (code !== 0) {
+                        vscode.window.showErrorMessage(stderr);
+                        return;
+                    }
+                    let names = this.parseNamesFromKubectlLines(stdout);
+                    if (names.length === 0) {
+                        vscode.window.showInformationMessage("No resources of type " + "pod" + " in cluster");
+                        return;
+                    } else {
+                        console.log(names);
+                        const podName = names[0];
+                        let cmd = 'logs ' + podName;
+
+
+                        cmd += ' --container=' + functionName;
+                        cmd += " --since=10s";
+
+                        this.kubectl.invoke(cmd, (code, stdout, stderr) => {
+                            this.output.clear();
+
+                            const errorPos = stdout.search(/failed/gi);
+                            const errorString = stdout.substring(errorPos);
+                            this.output.appendLine(errorString);
+                            this.output.show();
+
+                            this.parseErrorOutput(editor, errorString);
+
+
+                        });
+
+                    }
+                });
+            }
+            else {
+                //show function output
+
+                this.output.appendLine(stdout);
+                this.output.show();
+            }
+
+        });
+
+
+    }
+
+
+
+
+
+    private parseErrorOutput(editor: vscode.TextEditor, error: String) {
+        const byLine = error.split("\n");
+        const fileLine = byLine[1];
+        const explain = byLine[0].substring(byLine[0].indexOf(":") + 2);
+        console.log(explain);
+        const lineNumberStart = fileLine.indexOf(":") + 1;
+        console.log(lineNumberStart);
+        const lineNumberEnd = fileLine.lastIndexOf(":");
+        console.log(lineNumberEnd);
+
+        const lineNumber = fileLine.substring(+lineNumberStart, +lineNumberEnd);
+        console.log(lineNumber);
+
+        console.log(fileLine + " --> " + lineNumber);
+        let diagnostics: vscode.Diagnostic[] = [];
+
+        let severity = vscode.DiagnosticSeverity.Error;
+        let range = new vscode.Range(+lineNumber - 1, +fileLine.substring(+lineNumberEnd), +lineNumber - 1, 12); //+ casts string to int
+        let diagnostic = new vscode.Diagnostic(range, explain, severity);
+        diagnostics.push(diagnostic);
+
+
+        this.dc.clear();
+        this.dc.delete(editor.document.uri);
+        this.dc.set(editor.document.uri, diagnostics);
+
+
+    }
+
+
+    private parseNamesFromKubectlLines(text) {
+        let lines = text.split('\n');
+        lines.shift();
+
+        let names = lines.filter((line) => {
+            return line.length > 0;
+        }).map((line) => {
+            return line.split(' ')[0];
+        });
+
+        return names;
+    }
 
 }
 

@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import * as vscode from 'vscode';
 import { Kubectl } from "../kubectl";
+import * as kubectlUtils from './../kubectlUtils';
 import * as explorer from '../explorer';
 export async function createNewEnvironment() {
 
@@ -55,4 +56,47 @@ export async function installKyma() {
 export async function addServiceInstance(kubectl: Kubectl) {
     const serviceName = await vscode.window.showQuickPick(["Redis", "MySQL"], { placeHolder: "Add to Env" });
     console.log(serviceName);
+}
+
+
+let currentPanel: vscode.WebviewPanel | undefined = undefined;
+export async function visualize(kubectl: Kubectl) {
+
+    const columntoShow = vscode.window.activeTextEditor ? vscode.ViewColumn.Two : undefined;
+
+    if (currentPanel) {
+        currentPanel.reveal(columntoShow);
+    } else {
+        currentPanel = vscode.window.createWebviewPanel("visWebView",
+            "Kyma Vis.",
+            vscode.ViewColumn.Two, { enableScripts: true });
+
+
+        const currentNamespace = await kubectlUtils.currentNamespace(kubectl);
+        currentPanel.webview.html = getWebViewContent(currentNamespace);
+
+        currentPanel.onDidDispose(() => {
+            currentPanel = undefined;
+        });
+
+    }
+
+
+}
+
+
+
+function getWebViewContent(cn) {
+    return `<!DOCTYPE html>
+    <meta charset="utf-8">
+    <body>
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
+    <script src="https://unpkg.com/d3-graphviz@1.4.0/build/d3-graphviz.min.js"></script>
+    <div id="graph" style="text-align: center;"></div>
+    <script>
+    d3.select("#graph").graphviz()
+        .fade(false)
+        .renderDot('digraph  {a -> b}');
+    </script>`;
 }

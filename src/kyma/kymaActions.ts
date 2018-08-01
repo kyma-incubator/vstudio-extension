@@ -31,7 +31,12 @@ export async function createNewEnvironment() {
 export async function deleteEnvironment(kubectl: Kubectl, explorerNode: explorer.KubernetesObject) {
 
 
-    kubectl.invokeInNewTerminal(`delete namespace ${explorerNode.id}`, "kubectl");
+    kubectlUtils.getNamespaces(kubectl).then(async (value) => {
+        const choice = await vscode.window.showQuickPick(value.map((data) => data.name));
+        console.log(choice);
+        kubectl.invokeInNewTerminal(`delete namespace ${choice}`, "kubectl");
+    });
+
 
 }
 
@@ -90,9 +95,9 @@ function getWebViewContent(cn) {
     return `<!DOCTYPE html>
     <meta charset="utf-8">
     <body>
-    <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
-    <script src="https://unpkg.com/d3-graphviz@1.4.0/build/d3-graphviz.min.js"></script>
+    <script src="//d3js.org/d3.v4.min.js" type="application/javascript"></script>
+    <script src="https://unpkg.com/viz.js@1.8.0/viz.js"  type="application/javascript"></script>
+    <script src="https://unpkg.com/d3-graphviz@1.4.0/build/d3-graphviz.min.js"  type="application/javascript"></script>
     <div id="graph" style="text-align: center;"></div>
     <script>
     d3.select("#graph").graphviz()

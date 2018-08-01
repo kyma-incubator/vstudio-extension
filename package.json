@@ -124,7 +124,7 @@
                         "vs-kubernetes.outputFormat": "yaml",
                         "vs-kubernetes.kubeconfig": "",
                         "vs-kubernetes.autoCleanupOnDebugTerminate": false,
-                        "kyma.schema-server-port": 4444
+                        "kyma.schema-server-port": 44004
                     }
                 },
                 "vsdocker.imageUser": {
@@ -138,7 +138,7 @@
             "kubernetesView": [
                 {
                     "id": "extension.vsKubernetesExplorer",
-                    "name": "Kubernetes"
+                    "name": "Overview"
                 }
             ]
         },

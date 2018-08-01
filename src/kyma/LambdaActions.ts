@@ -5,7 +5,6 @@ import * as yaml from 'js-yaml';
 import { currentNamespace } from '../kubectlUtils';
 import { Kubectl } from '../kubectl';
 import { shell } from '../shell';
-import { execPath } from '../binutil';
 export class LambdaActions {
 
     constructor(private readonly kubectl: Kubectl) { }
@@ -88,7 +87,7 @@ export class LambdaActions {
 
         this.apiConf.metadata.labels.function = this.deployConf.metadata.name;
         this.apiConf.metadata.name = this.deployConf.metadata.name;
-        this.apiConf.spec.hostname = this.deployConf.metadata.name + ".yfactory.sap.corp";
+        this.apiConf.spec.hostname = this.deployConf.metadata.name + ".kyma.local";
         this.apiConf.spec.service.name = this.deployConf.metadata.name;
 
         const workspacePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "api-without-auth.yaml");
@@ -113,8 +112,18 @@ export class LambdaActions {
 
 
 
-    debugLambda(editor: vscode.TextEditor) {
-        const functionName = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
+    async debugLambda(editor: vscode.TextEditor) {
+
+        let functionName = "";
+        if (editor.document.languageId !== 'javascript') {
+            const fn = await this.getKubelessFunctions();
+
+            functionName = await vscode.window.showQuickPick([fn.metadata.name]);
+
+        } else {
+            functionName = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
+
+        }
         vscode.window.showInformationMessage("Running the debug command");
         shell.exec("kubeless function call " + functionName).then(({ code, stdout, stderr }
         ) => {
@@ -131,7 +140,7 @@ export class LambdaActions {
                         return;
                     } else {
                         console.log(names);
-                        const podName = names[0];
+                        const podName = names.filter((podName) => podName.includes(functionName));
                         let cmd = 'logs ' + podName;
 
 
@@ -213,6 +222,20 @@ export class LambdaActions {
         return names;
     }
 
+    private async getKubelessFunctions() {
+        let functions: any;
+        functions = await shell.exec('kubeless function ls -o json').then(({ code, stdout, stderr }
+        ) => {
+
+            functions = JSON.parse(stdout);
+
+            return functions;
+
+        });
+        console.log(`in func:`);
+        console.log(functions);
+        return functions;
+    }
 }
 
 /*

@@ -7,7 +7,7 @@
 - Go to extension in VS Code , click 3 dots and select install from vsix.
 - Select the file.
 - Reload.
-- You need to have `kubectl` and `kubeless` in your path.
+- You need to have `kubectl` and `kubeless`* in your path.
 
 ## Developing
 - Clone this repo.
@@ -49,3 +49,5 @@
 ---
 ### Known Problems
 - Check issues.
+---
+- \* This plugin currently relies on unstable version of `kubeless`. `Kubeless` had a bug that prevented this code from working correctly. While the issue is fixed now, the fix is in a unreleased version of kubeless. For more info: [Github issue](https://github.com/kubeless/kubeless/issues/874#event-1769345570)

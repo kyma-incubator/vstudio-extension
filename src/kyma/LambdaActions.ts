@@ -118,7 +118,8 @@ export class LambdaActions {
         if (editor.document.languageId !== 'javascript') {
             const fn = await this.getKubelessFunctions();
 
-            functionName = await vscode.window.showQuickPick([fn.metadata.name]);
+            functionName = await vscode.window.showQuickPick(fn.map((f) => f.metadata.name));
+            console.log(`selected func -> ${functionName}`);
 
         } else {
             functionName = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
@@ -127,8 +128,10 @@ export class LambdaActions {
         vscode.window.showInformationMessage("Running the debug command");
         shell.exec("kubeless function call " + functionName).then(({ code, stdout, stderr }
         ) => {
+            this.output.clear();
             if (code == 1) { //means exited with error
                 //get logs and find error
+                this.output.appendLine(stderr);
                 this.kubectl.invoke("get " + "pod", (code, stdout, stderr) => {
                     if (code !== 0) {
                         vscode.window.showErrorMessage(stderr);
@@ -148,14 +151,26 @@ export class LambdaActions {
                         cmd += " --since=10s";
 
                         this.kubectl.invoke(cmd, (code, stdout, stderr) => {
-                            this.output.clear();
 
-                            const errorPos = stdout.search(/failed/gi);
-                            const errorString = stdout.substring(errorPos);
-                            this.output.appendLine(errorString);
-                            this.output.show();
 
-                            this.parseErrorOutput(editor, errorString);
+                            let errorPos = stdout.search(/failed/gi);
+                            if (errorPos == -1) {
+                                errorPos = stdout.search(/Error/gi);
+                                const errorString = stdout.substring(errorPos);
+
+                                this.output.appendLine(errorString);
+                                this.output.show();
+
+                            } else {
+                                const errorString = stdout.substring(errorPos);
+
+                                this.output.appendLine(errorString);
+                                this.output.show();
+                                this.parseErrorOutput(editor, errorString);
+                            }
+
+
+
 
 
                         });

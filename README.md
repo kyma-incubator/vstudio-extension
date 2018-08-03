@@ -28,7 +28,7 @@
     - [x] Remote Environments
 - [x] Hovering to function keyword reveals currently running functions.
 - [x] Learn about Kyma Deployment files.
-    - [ ] provide hovering info to => servicecatalog.kyma.cx/v1alpha1
+    - [x] provide hovering info to => servicecatalog.kyma.cx/v1alpha1
 - [x] Provide schema validation for Kyma deployment files
     - [x] Add configuration option to change default port 
 - [x] Snippets

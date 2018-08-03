@@ -179,9 +179,9 @@ const kubeSchema: KubernetesSchemaHolder = new KubernetesSchemaHolder();
 
 
 function startSchemaServer() {
-    const apiSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/kyma-schema.json"));
+    const apiSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/api-schema.json"));
     const kubelessSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/kubeless-schema.json"));
-
+    const servicecatalogschema = fs.readFileSync(path.join(__dirname, "./../../../schema/servicecatalog-schema.json"));
     http.createServer((req, res) => {
         const query = url.parse(req.url, true).query;
         if (query.schema === "api") {
@@ -190,6 +190,10 @@ function startSchemaServer() {
         }
         else if (query.schema === "kubeless") {
             res.write(kubelessSchema);
+            res.end();
+        }
+        else if (query.schema === "servicecatalog") {
+            res.write(servicecatalogschema);
             res.end();
         }
     }).listen(PORT);
@@ -231,9 +235,13 @@ function getKymaUrl(resource: string): string {
                         console.log("api");
                         url = `http://localhost:${PORT}/?schema=api`;
                     }
-                    else if (apiVersion == "kubeless.io/v1beta1") {
+                    else if (apiVersion === "kubeless.io/v1beta1") {
                         console.log("kubeless");
                         url = `http://localhost:${PORT}/?schema=kubeless`;
+                    }
+                    else if (apiVersion === "servicecatalog.kyma.cx/v1alpha1") {
+                        console.log("service catalog");
+                        url = `http://localhost:${PORT}/?schema=servicecatalog`;
                     }
                 }
             }

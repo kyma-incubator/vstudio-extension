@@ -52,32 +52,34 @@ export class LambdaActions {
     async deployToKyma(editor: vscode.TextEditor, kubectl: Kubectl) {
 
         console.log("deploying lambda to kyma");
-        this.deployConf.spec.runtime = editor.document.languageId === "javascript" ? "nodejs8" : "any";
+        if (editor.document.languageId === "javascript") {
+            this.deployConf.spec.runtime = "nodejs8";
 
-        if (this.deployConf.spec.runtime === "any") {
-            vscode.window.showErrorMessage("Not a javascript file, Aborting...");
-            return;
+
+
+
+            this.deployConf.spec.function = editor.document.getText().replace(/(\r\n\t|\n|\r\t)/gm, "");
+
+            this.deployConf.spec.deps = await this.lookForDeps();
+
+            this.deployConf.metadata.name = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
+
+            console.log(this.deployConf);
+
+            const workspacePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "deployment.yaml"); //FIXME: assumes only one workspace is opened.
+            fs.writeFileSync(workspacePath, yaml.safeDump(this.deployConf), { encoding: "utf8", flag: "w" });
+
+            const namespace = await currentNamespace(kubectl);
+
+            if (namespace === "default") {
+                vscode.window.showWarningMessage("You can't deploy to default, select a Kyma environment.");
+                return;
+            }
+            await kubectl.invokeInSharedTerminal(`apply -f ${workspacePath} -n ${namespace}`);
         }
-
-        this.deployConf.spec.function = editor.document.getText().replace(/(\r\n\t|\n|\r\t)/gm, "");
-
-        this.deployConf.spec.deps = await this.lookForDeps();
-
-        this.deployConf.metadata.name = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
-
-        console.log(this.deployConf);
-
-        const workspacePath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath, "deployment.yaml"); //FIXME: assumes only one workspace is opened.
-        fs.writeFileSync(workspacePath, yaml.safeDump(this.deployConf), { encoding: "utf8", flag: "w" });
-
-        const namespace = await currentNamespace(kubectl);
-
-        if (namespace === "default") {
-            vscode.window.showWarningMessage("You can't deploy to default, select a Kyma environment.");
-            return;
+        else if (editor.document.languageId === "yaml") {
+            kubectl.invokeInSharedTerminal(`apply -f ${editor.document.uri.fsPath}`);
         }
-        await kubectl.invokeInSharedTerminal(`apply -f ${workspacePath} -n ${namespace}`);
-
 
 
     }

@@ -27,7 +27,8 @@
     - [x] Services
     - [x] Remote Environments
 - [x] Hovering to function keyword reveals currently running functions.
-- [x] Learn about Kyma Deployment files
+- [x] Learn about Kyma Deployment files.
+    - [ ] provide hovering info to => servicecatalog.kyma.cx/v1alpha1
 - [x] Provide schema validation for Kyma deployment files
     - [x] Add configuration option to change default port 
 - [x] Snippets
@@ -37,6 +38,8 @@
 - [x] Deploy to Kyma functionality
     - [x] Deploy 
     - [x] Expose
+    - [x] deploy also lambdas in yaml files
+
 - [ ] Install Kyma
 - [ ] Add Service Instance
     - [ ] Redis
@@ -44,6 +47,9 @@
     - [x] We can provide debugging for pods running the kubernetes functions. 
     - [x] Can map it to kubeless .js files.
     - [ ] exploring more debugging options.
+    - [ ] put an action button in lambda functions.
+    - [ ] Check syntax of lambda function in yaml file.
+
 
 
 ---

@@ -124,7 +124,7 @@
                         "vs-kubernetes.outputFormat": "yaml",
                         "vs-kubernetes.kubeconfig": "",
                         "vs-kubernetes.autoCleanupOnDebugTerminate": false,
-                        "kyma.schema-server-port": 44004
+                        "kyma.schema-server-port": 44002
                     }
                 },
                 "vsdocker.imageUser": {
@@ -874,7 +874,7 @@
         "restify": "^6.3.4",
         "shelljs": "^0.7.7",
         "tar": "^4.4.1",
-        "tmp": "^0.0.31",
+        "tmp": "0.0.31",
         "uuid": "^3.1.0",
         "vscode-debugadapter": "1.27.0",
         "vscode-debugprotocol": "1.27.0",

@@ -2,9 +2,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
+import { execSync } from "child_process";
 import { currentNamespace } from '../kubectlUtils';
 import { Kubectl } from '../kubectl';
 import { shell } from '../shell';
+import * as tmp from "tmp";
 export class LambdaActions {
 
     constructor(private readonly kubectl: Kubectl) { }
@@ -78,7 +80,15 @@ export class LambdaActions {
             await kubectl.invokeInSharedTerminal(`apply -f ${workspacePath} -n ${namespace}`);
         }
         else if (editor.document.languageId === "yaml") {
-            kubectl.invokeInSharedTerminal(`apply -f ${editor.document.uri.fsPath}`);
+            // kubectl.invokeInSharedTerminal(`apply -f ${editor.document.uri}`);
+            const yamlText = editor.document.getText();
+            console.log(yamlText);
+            let tmpFile = tmp.fileSync({ mode: 644, prefix: "lambdaDeploy-", postfix: ".yaml" });
+            console.log(tmpFile.name);
+            console.log(tmpFile.fd);
+            fs.writeFileSync(tmpFile.name, editor.document.getText());
+            await kubectl.invokeInSharedTerminal(`apply -f ${tmpFile.name}`);
+
         }
 
 
@@ -117,16 +127,30 @@ export class LambdaActions {
     async debugLambda(editor: vscode.TextEditor) {
 
         let functionName = "";
-        if (editor.document.languageId !== 'javascript') {
-            const fn = await this.getKubelessFunctions();
-
-            functionName = await vscode.window.showQuickPick(fn.map((f) => f.metadata.name));
-            console.log(`selected func -> ${functionName}`);
-
-        } else {
+        if (editor.document.languageId === "javascript") {
             functionName = path.basename(editor.document.uri.fsPath, path.extname(editor.document.uri.fsPath));
 
         }
+        else if (editor.document.languageId === "yaml") {
+            console.log(yaml.safeLoad(editor.document.getText()));
+            functionName = yaml.safeLoad(editor.document.getText()).metadata.name;
+
+            console.log(functionName);
+        }
+        else {
+
+            const fn = await this.getKubelessFunctions();
+
+            functionName = await vscode.window.showQuickPick(fn.map((f) => f.metadata.name));
+            if (functionName === undefined) {
+                console.log("No function selected...");
+                return;
+            }
+            console.log(`selected func -> ${functionName}`);
+
+
+        }
+
         vscode.window.showInformationMessage("Running the debug command");
         shell.exec("kubeless function call " + functionName).then(({ code, stdout, stderr }
         ) => {
@@ -206,14 +230,25 @@ export class LambdaActions {
         const lineNumberEnd = fileLine.lastIndexOf(":");
         console.log(lineNumberEnd);
 
-        const lineNumber = fileLine.substring(+lineNumberStart, +lineNumberEnd);
+        let lineNumber = +fileLine.substring(+lineNumberStart, +lineNumberEnd); //+ casts string to int
         console.log(lineNumber);
 
         console.log(fileLine + " --> " + lineNumber);
         let diagnostics: vscode.Diagnostic[] = [];
 
         let severity = vscode.DiagnosticSeverity.Error;
-        let range = new vscode.Range(+lineNumber - 1, +fileLine.substring(+lineNumberEnd), +lineNumber - 1, 12); //+ casts string to int
+        if (editor.document.languageId == "yaml") {
+            for (let i = 0; i < editor.document.lineCount; i++) {
+                if (editor.document.lineAt(i).text.includes("function")) {
+                    lineNumber = i + 1 + lineNumber;
+                    console.log("i:" + i);
+                    console.log("ln:" + lineNumber);
+                    break; //first function is enough for us
+                }
+            }
+        }
+        let range = new vscode.Range(lineNumber - 1, +fileLine.substring(lineNumberEnd), lineNumber - 1, 20); //20 is just a constant
+
         let diagnostic = new vscode.Diagnostic(range, explain, severity);
         diagnostics.push(diagnostic);
 
@@ -231,7 +266,7 @@ export class LambdaActions {
         lines.shift();
 
         let names = lines.filter((line) => {
-            return line.length > 0;
+            return (line.length > 0) && line.includes("Running");
         }).map((line) => {
             return line.split(' ')[0];
         });

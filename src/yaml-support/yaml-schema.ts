@@ -184,18 +184,22 @@ function startSchemaServer() {
     const servicecatalogschema = fs.readFileSync(path.join(__dirname, "./../../../schema/servicecatalog-schema.json"));
     http.createServer((req, res) => {
         const query = url.parse(req.url, true).query;
-        if (query.schema === "api") {
-            res.write(apiSchema);
-            res.end();
+        switch (query.schema) {
+            case "api":
+                res.write(apiSchema);
+                res.end();
+                break;
+            case "sc":
+                res.write(servicecatalogschema);
+                res.end();
+                break;
+            case "kubeless":
+                res.write(kubelessSchema);
+                res.end();
+                break;
+
         }
-        else if (query.schema === "kubeless") {
-            res.write(kubelessSchema);
-            res.end();
-        }
-        else if (query.schema === "servicecatalog") {
-            res.write(servicecatalogschema);
-            res.end();
-        }
+
     }).listen(PORT);
     console.log(PORT);
 }
@@ -241,7 +245,7 @@ function getKymaUrl(resource: string): string {
                     }
                     else if (apiVersion === "servicecatalog.kyma.cx/v1alpha1") {
                         console.log("service catalog");
-                        url = `http://localhost:${PORT}/?schema=servicecatalog`;
+                        url = `http://localhost:${PORT}/?schema=sc`;
                     }
                 }
             }

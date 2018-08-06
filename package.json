@@ -894,6 +894,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.wdf.sap.corp/D073681/kyma-vscode-plugin"
+        "url": "https://github.com/Azure/vscode-kubernetes-tools"
     }
 }

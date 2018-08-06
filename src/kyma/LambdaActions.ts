@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import { execSync } from "child_process";
 import { currentNamespace } from '../kubectlUtils';
 import { Kubectl } from '../kubectl';
 import { shell } from '../shell';

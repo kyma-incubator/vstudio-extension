@@ -182,6 +182,7 @@ function startSchemaServer() {
     const apiSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/api-schema.json"));
     const kubelessSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/kubeless-schema.json"));
     const servicecatalogschema = fs.readFileSync(path.join(__dirname, "./../../../schema/servicecatalog-schema.json"));
+    const remoteEnvSchema = fs.readFileSync(path.join(__dirname, "./../../../schema/remoteenv-schema.json"));
     http.createServer((req, res) => {
         const query = url.parse(req.url, true).query;
         switch (query.schema) {
@@ -195,6 +196,10 @@ function startSchemaServer() {
                 break;
             case "kubeless":
                 res.write(kubelessSchema);
+                res.end();
+                break;
+            case "re":
+                res.write(remoteEnvSchema);
                 res.end();
                 break;
 
@@ -246,6 +251,11 @@ function getKymaUrl(resource: string): string {
                     else if (apiVersion === "servicecatalog.kyma.cx/v1alpha1") {
                         console.log("service catalog");
                         url = `http://localhost:${PORT}/?schema=sc`;
+                    }
+                    else if (apiVersion === "remoteenvironment.kyma.cx/v1alpha1") {
+                        console.log("service catalog");
+                        url = `http://localhost:${PORT}/?schema=re`;
+
                     }
                 }
             }

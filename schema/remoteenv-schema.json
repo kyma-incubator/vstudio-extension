@@ -1,0 +1,81 @@
+{
+    "id": "remoteenv",
+    "title": "remoteenv",
+    "description": "Kyma Remote Environment Description",
+    "type": "object",
+    "required": [
+        "apiVersion",
+        "kind",
+        "metadata",
+        "spec"
+    ],
+    "properties": {
+        "apiVersion": {
+            "type": "string",
+            "description": "This defines your remote environment version."
+        },
+        "kind": {
+            "type": "string",
+            "description": "What kind of resource are you deploying ? \n\n  Options are: Function , Deployment, Service, Api"
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Label your resources for better accesibility",
+            "required": [
+                "labels",
+                "name"
+            ],
+            "properties": {
+                "labels": {
+                    "type": "object",
+                    "description": "Label your resources for better accesibility"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of your lambda function"
+                }
+            }
+        },
+        "spec": {
+            "type": "object",
+            "description": "Specs of your deployment",
+            "required": [
+                "serviceBindingRef",
+                "usedBy"
+            ],
+            "properties": {
+                "serviceBindingRef": {
+                    "type": "object",
+                    "description": "Your service binding reference",
+                    "required": [
+                        "name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Name of your service binding reference"
+                        }
+                    }
+                },
+                "usedBy": {
+                    "type": "object",
+                    "description": "Who uses this service instance ?",
+                    "required": [
+                        "kind",
+                        "name"
+                    ],
+                    "properties": {
+                        "kind": {
+                            "type": "string",
+                            "description": "kind of the application that uses it"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "Name of the application that uses it"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -2,7 +2,7 @@
     "name": "vscode-kyma-tools",
     "displayName": "Kyma",
     "description": "Develop, deploy and debug Kyma applications",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "preview": true,
     "publisher": "hybris-kyma-tools",
     "engines": {

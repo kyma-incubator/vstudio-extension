@@ -39,10 +39,6 @@
         "spec": {
             "type": "object",
             "description": "Specs of your deployment",
-            "required": [
-                "serviceBindingRef",
-                "usedBy"
-            ],
             "properties": {
                 "serviceBindingRef": {
                     "type": "object",

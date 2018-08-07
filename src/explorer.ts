@@ -104,7 +104,7 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesDataHolderFolder(kuberesources.allKinds.secret),
             new KubernetesResourceFolder(kuberesources.allKinds.lambda),
             new KubernetesResourceFolder(kuberesources.allKinds.api),
-            new KubernetesDataHolderFolder(kuberesources.allKinds.remoteenvironment)
+            new KubernetesResourceFolder(kuberesources.allKinds.remoteenvironment)
         ];
     }
 
@@ -191,9 +191,11 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
         };
         treeItem.contextValue = `vsKubernetes.resource`;
         if (this.kind === kuberesources.allKinds.pod ||
-            this.kind == kuberesources.allKinds.secret ||
-            this.kind == kuberesources.allKinds.lambda ||
-            this.kind == kuberesources.allKinds.api) {
+            this.kind === kuberesources.allKinds.secret ||
+            this.kind === kuberesources.allKinds.lambda ||
+            this.kind === kuberesources.allKinds.api ||
+            this.kind === kuberesources.allKinds.remoteenvironment ||
+            this.kind === kuberesources.allKinds.node) {
             treeItem.contextValue = `vsKubernetes.resource.${this.kind.abbreviation}`;
             if (this.kind === kuberesources.allKinds.pod && this.metadata.status !== null) {
                 treeItem.iconPath = getIconForPodStatus(this.metadata.status);
@@ -203,6 +205,12 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             }
             else if (this.kind === kuberesources.allKinds.api) {
                 treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/api-icon.svg"));
+            }
+            else if (this.kind === kuberesources.allKinds.remoteenvironment) {
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/remote-control.svg"));
+            }
+            else if (this.kind === kuberesources.allKinds.node) {
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/laptop.svg"));
             }
         }
         return treeItem;

@@ -2,7 +2,7 @@
     "name": "vscode-kyma-tools",
     "displayName": "Kyma",
     "description": "Develop, deploy and debug Kyma applications",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "preview": true,
     "publisher": "hybris-kyma-tools",
     "engines": {
@@ -64,9 +64,7 @@
         "onLanguage:yaml",
         "onDebug",
         "onCommand:extension.deployToKyma",
-        "onCommand:extension.installKyma",
         "onCommand:extension.addServiceInstance",
-        "onCommand:extension.visualize",
         "onCommand:extension.debugLambda"
     ],
     "main": "./out/src/extension",
@@ -565,7 +563,7 @@
             {
                 "command": "extension.vsKubernetesDashboard",
                 "title": "Open Console",
-                "category": "Kyma-Kubernetes"
+                "category": "Kyma"
             },
             {
                 "command": "extension.vsKubernetesPortForward",
@@ -678,23 +676,6 @@
                 "command": "extension.exposeLambda",
                 "title": "Expose Lambda",
                 "description": "Expose your lambda func to internet",
-                "category": "Kyma"
-            },
-            {
-                "command": "extension.installKyma",
-                "title": "Install Kyma",
-                "description": "Install Lambda to Minikube",
-                "category": "Kyma"
-            },
-            {
-                "command": "extension.addServiceInstance",
-                "title": "Deploy Service Instance to Kyma",
-                "description": "Deploy service Instance to Kyma",
-                "category": "Kyma"
-            },
-            {
-                "command": "extension.visualize",
-                "title": "Visualize Kyma",
                 "category": "Kyma"
             },
             {

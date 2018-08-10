@@ -103,7 +103,7 @@ export async function dashboardKubernetes(): Promise<void> {
     // providers. In an ideal world, we'd only use `kubectl proxy`, this
     // is intended as a stopgap until we can re-evaluate the implementation
     // in the future.
-    opn("https://console.yfactory.sap.corp");
+    opn("https://console.kyma.local");
 }
 
 /**

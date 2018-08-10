@@ -183,9 +183,7 @@ export async function activate(context): Promise<extensionapi.ExtensionAPI> {
                 refreshExplorer();
             }, 1000);
         }),
-        registerCommand("extension.visualize", () => kyma.visualize(kubectl)),
-        registerCommand("extension.installKyma", kyma.installKyma), //FIXME: implement it
-        registerCommand("extension.addServiceInstance", kyma.addServiceInstance),
+
         vscode.commands.registerTextEditorCommand("extension.debugLambda", (editor) => lambdaActionsProvider.debugLambda(editor)),
 
         // Draft debug configuration provider

@@ -260,7 +260,7 @@ function getKymaUrl(resource: string): string {
                 }
             }
         });
-        console.log("selam");
+
         return url;
     }
 }

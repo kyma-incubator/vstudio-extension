@@ -101,7 +101,7 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesServiceFolder(),
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
 
-            new KubernetesDataHolderFolder(kuberesources.allKinds.secret),
+            new KubernetesResourceFolder(kuberesources.allKinds.secret),
             new KubernetesResourceFolder(kuberesources.allKinds.lambda),
             new KubernetesResourceFolder(kuberesources.allKinds.api),
             new KubernetesResourceFolder(kuberesources.allKinds.remoteenvironment)
@@ -212,6 +212,10 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             else if (this.kind === kuberesources.allKinds.node) {
                 treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/laptop.svg"));
             }
+            else if (this.kind === kuberesources.allKinds.secret) {
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/key_icon.svg"));
+
+            }
         }
         return treeItem;
     }
@@ -238,9 +242,13 @@ class KubernetesNamespaceResource extends KubernetesResource {
         treeItem.contextValue = `vsKubernetes.resource.${this.kind.abbreviation}`;
         if (this.metadata.active) {
             treeItem.label = "* " + treeItem.label;
+            treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/clipboard-flat.svg"));
         } else {
             treeItem.contextValue += ".inactive";
+            treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/list-flat.svg"));
         }
+
+
         return treeItem;
     }
 }
@@ -276,7 +284,7 @@ class KubernetesSelectorResource extends KubernetesResource {
 
     async getTreeItem(): Promise<vscode.TreeItem> {
         const treeItem = await super.getTreeItem();
-        treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+        treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
         return treeItem;
     }
 
@@ -286,16 +294,6 @@ class KubernetesSelectorResource extends KubernetesResource {
     }
 }
 
-class KubernetesDataHolderFolder extends KubernetesResourceFolder {
-    constructor(kind: kuberesources.ResourceKind) {
-        super(kind);
-    }
-
-    async getChildren(kubectl: Kubectl, host: Host): Promise<KubernetesObject[]> {
-        const namespaces = await kubectlUtils.getDataHolders(this.kind.abbreviation, kubectl);
-        return namespaces.map((cm) => new KubernetesDataHolderResource(this.kind, cm.metadata.name, cm, cm.data));
-    }
-}
 
 export class KubernetesDataHolderResource extends KubernetesResource {
     readonly configData: any;

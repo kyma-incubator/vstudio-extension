@@ -205,7 +205,7 @@ export class LambdaActions {
             }
             else {
                 //show function output
-
+                this.dc.clear();
                 this.output.appendLine(stdout);
                 this.output.show();
             }

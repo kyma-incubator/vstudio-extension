@@ -98,7 +98,7 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesNamespaceFolder(),
             new KubernetesResourceFolder(kuberesources.allKinds.node),
             new KubernetesWorkloadFolder(),
-            new KubernetesServiceFolder(),
+            new KubernetesResourceFolder(kuberesources.allKinds.service),
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
 
             new KubernetesResourceFolder(kuberesources.allKinds.secret),
@@ -250,17 +250,6 @@ class KubernetesNamespaceResource extends KubernetesResource {
 
 
         return treeItem;
-    }
-}
-
-class KubernetesServiceFolder extends KubernetesResourceFolder {
-    constructor() {
-        super(kuberesources.allKinds.service);
-    }
-
-    async getChildren(kubectl: Kubectl, host: Host): Promise<KubernetesObject[]> {
-        const services = await kubectlUtils.getServices(kubectl);
-        return services.map((svc) => new KubernetesSelectorResource(this.kind, svc.name, svc, svc.selector));
     }
 }
 

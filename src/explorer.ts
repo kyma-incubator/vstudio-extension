@@ -98,7 +98,7 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesNamespaceFolder(),
             new KubernetesResourceFolder(kuberesources.allKinds.node),
             new KubernetesWorkloadFolder(),
-            new KubernetesServiceFolder(),
+            new KubernetesResourceFolder(kuberesources.allKinds.service),
             new KubernetesResourceFolder(kuberesources.allKinds.ingress),
 
             new KubernetesResourceFolder(kuberesources.allKinds.secret),
@@ -195,7 +195,8 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             this.kind === kuberesources.allKinds.lambda ||
             this.kind === kuberesources.allKinds.api ||
             this.kind === kuberesources.allKinds.remoteenvironment ||
-            this.kind === kuberesources.allKinds.node) {
+            this.kind === kuberesources.allKinds.node ||
+            this.kind === kuberesources.allKinds.service) {
             treeItem.contextValue = `vsKubernetes.resource.${this.kind.abbreviation}`;
             if (this.kind === kuberesources.allKinds.pod && this.metadata.status !== null) {
                 treeItem.iconPath = getIconForPodStatus(this.metadata.status);
@@ -215,6 +216,8 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             else if (this.kind === kuberesources.allKinds.secret) {
                 treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/key_icon.svg"));
 
+            } else if (this.kind === kuberesources.allKinds.service) {
+                treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/connection.svg"));
             }
         }
         return treeItem;
@@ -250,17 +253,6 @@ class KubernetesNamespaceResource extends KubernetesResource {
 
 
         return treeItem;
-    }
-}
-
-class KubernetesServiceFolder extends KubernetesResourceFolder {
-    constructor() {
-        super(kuberesources.allKinds.service);
-    }
-
-    async getChildren(kubectl: Kubectl, host: Host): Promise<KubernetesObject[]> {
-        const services = await kubectlUtils.getServices(kubectl);
-        return services.map((svc) => new KubernetesSelectorResource(this.kind, svc.name, svc, svc.selector));
     }
 }
 

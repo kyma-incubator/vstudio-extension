@@ -15,6 +15,11 @@ npm install
 npm run postinstall'''
       }
     }
+    stage ('Test'){
+      steps{
+        sh 'npm test'
+      }
+    }
     stage('Package') {
       steps {
         sh 'vsce package'

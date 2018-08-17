@@ -1,25 +1,16 @@
 #!/usr/bin/env groovy
 def label = "kyma-${UUID.randomUUID().toString()}"
 def application = 'vscode-plugin'
-def isMaster = params.GIT_BRANCH == 'master'
-
-def dockerPushRoot = isMaster 
-    ? "${env.DOCKER_REGISTRY}"
-    : "${env.DOCKER_REGISTRY}snapshot/"
-
-def dockerImageTag = isMaster
-    ? params.APP_VERSION
-    : params.GIT_BRANCH
+dockerRegistry = 'eu.gcr.io/kyma-project/'
+def dockerCredentials = 'gcr-rw'
+def isMaster = env.BRANCH_NAME == 'master'
+def appVersion = env.TAG_NAME?env.TAG_NAME:"develop-${env.BRANCH_NAME}"
 
 echo """
 ********************************
 Job started with the following parameters:
-DOCKER_REGISTRY=${env.DOCKER_REGISTRY}
-DOCKER_CREDENTIALS=${env.DOCKER_CREDENTIALS}
-GIT_REVISION=${params.GIT_REVISION}
-GIT_BRANCH=${params.GIT_BRANCH}
-APP_VERSION=${params.APP_VERSION}
-APP_FOLDER=${env.APP_FOLDER}
+BRANCH_NAME=${env.BRANCH_NAME}
+TAG_NAME=${env.TAG_NAME}
 ********************************
 """
 
@@ -32,12 +23,8 @@ podTemplate(label: label) {
                         stage("setup") {
                             checkout scm
 
-                            if(dockerImageTag == ""){
-                               error("No version for docker tag defined, please set APP_VERSION parameter for master branch or GIT_BRANCH parameter for any branch")
-                           }
-
-                            withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, passwordVariable: 'pwd', usernameVariable: 'uname')]) {
-                                sh "docker login -u $uname -p '$pwd' $env.DOCKER_REGISTRY"
+                            withCredentials([usernamePassword(credentialsId: dockerCredentials, passwordVariable: 'pwd', usernameVariable: 'uname')]) {
+                                sh "docker login -u $uname -p '$pwd' $dockerRegistry"
                             }
 
                             if (isMaster) {
@@ -70,9 +57,10 @@ podTemplate(label: label) {
                                 scan.checkmarx(projectname: "KYMA_" + application.toUpperCase() + "_" + "MASTER", credentialsId: 'checkmarx' )
                             }
                         }
-                        
 
-            
+                        stage("archive $application") {
+                            archiveArtifacts artifacts: '*.vsix', onlyIfSuccessful: true
+                        }
                     }
                 }
             }
@@ -86,12 +74,12 @@ podTemplate(label: label) {
 }
 
 def execute(command, envs = []) {
-    def repositoryName = 'monorepo'
+    def repositoryName = 'kyma-vscode-plugin'
     def buildpack = 'node-buildpack:0.0.8'
     def envText = ''
     for (it in envs) {
         envText = "$envText --env $it"
     }
     workDir = pwd()
-    sh "docker run --rm -v $workDir:/$repositoryName -w /$repositoryName/$env.APP_FOLDER $envText ${env.DOCKER_REGISTRY}$buildpack /bin/bash -c '$command'"
+    sh "docker run --rm -v $workDir:/$repositoryName -w /$repositoryName $envText ${dockerRegistry}$buildpack /bin/bash -c '$command'"
 }

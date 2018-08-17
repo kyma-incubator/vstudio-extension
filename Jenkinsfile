@@ -37,7 +37,9 @@ podTemplate(label: label) {
 
 
                         stage("build $application") {
-                            execute("./build.sh")
+                            execute("npm install -g vsce typescript gulp")
+                            execute("npm install")
+                            execute("npm run postinstall")
                         }
 
                         stage("package $application") {

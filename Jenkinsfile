@@ -37,7 +37,7 @@ podTemplate(label: label) {
 
 
                         stage("build $application") {
-                            execute("build.sh")
+                            execute("./build.sh")
                         }
 
                         stage("package $application") {

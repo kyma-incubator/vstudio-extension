@@ -37,13 +37,12 @@ podTemplate(label: label) {
 
 
                         stage("build $application") {
-                            execute("npm install -g vsce typescript gulp")
                             execute("npm install")
-                            execute("npm run postinstall")
+                            execute("npm install -g typescript gulp && npm run postinstall")
                         }
 
                         stage("package $application") {
-                            execute("vsce package")
+                            execute("npm install -g vsce && vsce package")
                         }
 
                         if (isMaster) {

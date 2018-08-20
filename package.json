@@ -2,7 +2,7 @@
     "name": "vscode-kyma-tools",
     "displayName": "Kyma",
     "description": "Develop, deploy and debug Kyma applications",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "preview": true,
     "publisher": "hybris-kyma-tools",
     "engines": {
@@ -875,6 +875,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Azure/vscode-kubernetes-tools"
+        "url": "https://github.com/kyma-incubator/vstudio-extension"
     }
 }

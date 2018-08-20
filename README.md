@@ -8,6 +8,7 @@
 - Select the file.
 - Reload.
 - You need to have `kubectl` and `kubeless`* in your path.
+- Refer to [How To Use](HowToUse.md) for details.
 
 ## Developing
 - Clone this repo.

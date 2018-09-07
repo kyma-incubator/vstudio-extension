@@ -1,4 +1,4 @@
-# Kyma VS Code Plugin
+# Kyma Visual Studio Code Extension
 
 ![Kyma-tree-view](images/screenshots/kyma-tree-view.png)
 

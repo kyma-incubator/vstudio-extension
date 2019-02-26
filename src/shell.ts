@@ -24,15 +24,15 @@ export interface Shell {
 }
 
 export const shell: Shell = {
-    isWindows : isWindows,
-    isUnix : isUnix,
-    platform : platform,
-    home : home,
-    combinePath : combinePath,
-    fileUri : fileUri,
-    execOpts : execOpts,
-    exec : exec,
-    execCore : execCore,
+    isWindows: isWindows,
+    isUnix: isUnix,
+    platform: platform,
+    home: home,
+    combinePath: combinePath,
+    fileUri: fileUri,
+    execOpts: execOpts,
+    exec: exec,
+    execCore: execCore,
 };
 
 const WINDOWS: string = 'win32';
@@ -86,7 +86,7 @@ function fileUri(filePath: string): vscode.Uri {
 function execOpts(): any {
     let env = process.env;
     if (isWindows()) {
-        env = Object.assign({ }, env, { HOME: home() });
+        env = Object.assign({}, env, { HOME: home() });
     }
     env = shellEnvironment(env);
     const opts = {
@@ -107,7 +107,7 @@ async function exec(cmd: string, stdin?: string): Promise<ShellResult> {
 
 function execCore(cmd: string, opts: any, stdin?: string): Promise<ShellResult> {
     return new Promise<ShellResult>((resolve, reject) => {
-        let proc = shelljs.exec(cmd, opts, (code, stdout, stderr) => resolve({code : code, stdout : stdout, stderr : stderr}));
+        let proc = shelljs.exec(cmd, opts, (code, stdout, stderr) => resolve({ code: code, stdout: stdout, stderr: stderr }));
         if (stdin) {
             proc.stdin.end(stdin);
         }
@@ -118,7 +118,7 @@ export function shellEnvironment(baseEnvironment: any): any {
     let env = Object.assign({}, baseEnvironment);
     let pathVariable = pathVariableName(env);
     for (const tool of ['kubectl', 'helm', 'draft']) {
-        const toolPath = vscode.workspace.getConfiguration('vs-kubernetes')[`vs-kubernetes.${tool}-path`];
+        const toolPath = vscode.workspace.getConfiguration('vs-kyma')[`vs-kyma.${tool}-path`];
         if (toolPath) {
             const toolDirectory = path.dirname(toolPath);
             const currentPath = env[pathVariable];
@@ -126,7 +126,7 @@ export function shellEnvironment(baseEnvironment: any): any {
         }
     }
 
-    const kubeconfig: string = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.kubeconfig'];
+    const kubeconfig: string = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.kubeconfig'];
     if (kubeconfig) {
         env['KUBECONFIG'] = kubeconfig;
     }

@@ -45,7 +45,7 @@ export class KubernetesExplorer implements vscode.TreeDataProvider<KubernetesObj
 
     constructor(private readonly kubectl: Kubectl, private readonly host: Host) {
         host.onDidChangeConfiguration((change) => {
-            if (change.affectsConfiguration('vs-kubernetes')) {
+            if (change.affectsConfiguration('vs-kyma')) {
                 this.refresh();
             }
         });
@@ -104,7 +104,7 @@ class KubernetesCluster implements KubernetesObject {
             new KubernetesResourceFolder(kuberesources.allKinds.secret),
             new KubernetesResourceFolder(kuberesources.allKinds.lambda),
             new KubernetesResourceFolder(kuberesources.allKinds.api),
-            new KubernetesResourceFolder(kuberesources.allKinds.remoteenvironment)
+            new KubernetesResourceFolder(kuberesources.allKinds.application)
         ];
     }
 
@@ -194,7 +194,7 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             this.kind === kuberesources.allKinds.secret ||
             this.kind === kuberesources.allKinds.lambda ||
             this.kind === kuberesources.allKinds.api ||
-            this.kind === kuberesources.allKinds.remoteenvironment ||
+            this.kind === kuberesources.allKinds.application ||
             this.kind === kuberesources.allKinds.node ||
             this.kind === kuberesources.allKinds.service) {
             treeItem.contextValue = `vsKubernetes.resource.${this.kind.abbreviation}`;
@@ -207,7 +207,7 @@ class KubernetesResource implements KubernetesObject, ResourceNode {
             else if (this.kind === kuberesources.allKinds.api) {
                 treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/api-icon.svg"));
             }
-            else if (this.kind === kuberesources.allKinds.remoteenvironment) {
+            else if (this.kind === kuberesources.allKinds.application) {
                 treeItem.iconPath = vscode.Uri.file(path.join(__dirname, "../../images/remote-control.svg"));
             }
             else if (this.kind === kuberesources.allKinds.node) {

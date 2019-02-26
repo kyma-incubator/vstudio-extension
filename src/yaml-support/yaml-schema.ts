@@ -30,7 +30,7 @@ export interface KubernetesSchema {
 declare type YamlSchemaContributor = (schema: string,
     requestSchema: (resource: string) => string,
     requestSchemaContent: (uri: string) => string) => void;
-const PORT = vscode.workspace.getConfiguration("vs-kubernetes")["kyma.schema-server-port"];
+const PORT = vscode.workspace.getConfiguration("vs-kyma")["kyma.schema-server-port"];
 class KubernetesSchemaHolder {
     // the schema for kubernetes
     private _definitions: { [key: string]: KubernetesSchema; } = {};

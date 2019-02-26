@@ -54,8 +54,8 @@ export function helmTemplatePreview() {
     }
 
     let filePath = editor.document.fileName;
-    if (filePath.indexOf("templates") < 0 ) {
-        vscode.window.showInformationMessage("Not a template: " +filePath);
+    if (filePath.indexOf("templates") < 0) {
+        vscode.window.showInformationMessage("Not a template: " + filePath);
         return;
     }
 
@@ -65,7 +65,7 @@ export function helmTemplatePreview() {
 
     let u = vscode.Uri.parse(helm.PREVIEW_URI);
     let f = filepath.basename(filePath);
-    vscode.commands.executeCommand("vscode.previewHtml", u, vscode.ViewColumn.Two, `Preview ${ f }`);
+    vscode.commands.executeCommand("vscode.previewHtml", u, vscode.ViewColumn.Two, `Preview ${f}`);
     helm.recordPreviewHasBeenShown();
 }
 
@@ -153,7 +153,7 @@ export function pickChart(fn) {
         return;
     }
     vscode.workspace.findFiles("**/Chart.yaml", "", 1024).then((matches) => {
-        switch(matches.length) {
+        switch (matches.length) {
             case 0:
                 vscode.window.showErrorMessage("No charts found");
                 return;
@@ -201,7 +201,7 @@ export function loadChartMetadata(chartDir: string): Chart {
 export function pickChartForFile(file: string, options: PickChartUIOptions, fn) {
     vscode.workspace.findFiles("**/Chart.yaml", "", 1024).then((matches) => {
         //logger.log(`Found ${ matches.length } charts`)
-        switch(matches.length) {
+        switch (matches.length) {
             case 0:
                 if (options.warnIfNoCharts) {
                     vscode.window.showErrorMessage("No charts found");
@@ -255,21 +255,20 @@ export function helmExec(args: string, fn) {
     if (!ensureHelm(EnsureMode.Alert)) {
         return;
     }
-    const configuredBin: string | undefined = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.helm-path'];
+    const configuredBin: string | undefined = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.helm-path'];
     const bin = configuredBin ? `"${configuredBin}"` : "helm";
     const cmd = bin + " " + args;
     shell.exec(cmd, fn);
 }
 
 export function ensureHelm(mode: EnsureMode) {
-    const configuredBin: string | undefined = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.helm-path'];
+    const configuredBin: string | undefined = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.helm-path'];
     if (configuredBin) {
         if (fs.existsSync(configuredBin)) {
             return true;
         }
         if (mode === EnsureMode.Alert) {
-            vscode.window.showErrorMessage(`${configuredBin} does not exist!`, "Install dependencies").then((str) =>
-            {
+            vscode.window.showErrorMessage(`${configuredBin} does not exist!`, "Install dependencies").then((str) => {
                 if (str === "Install dependencies") {
                     extension.installDependencies();
                 }
@@ -281,8 +280,7 @@ export function ensureHelm(mode: EnsureMode) {
         return true;
     }
     if (mode === EnsureMode.Alert) {
-        vscode.window.showErrorMessage(`Could not find Helm binary.`, "Install dependencies").then((str) =>
-        {
+        vscode.window.showErrorMessage(`Could not find Helm binary.`, "Install dependencies").then((str) => {
             if (str === "Install dependencies") {
                 extension.installDependencies();
             }
@@ -297,7 +295,7 @@ export class Requirement {
     public version: string;
     toString(): string {
         return `- name: ${this.name}
-  version: ${ this.version }
+  version: ${ this.version}
   repository: ${ this.repository}
 `;
     }
@@ -310,7 +308,7 @@ export function insertRequirement() {
     }).then((val) => {
         let req = searchForChart(val);
         if (!req) {
-            vscode.window.showErrorMessage(`Chart ${ val } not found`);
+            vscode.window.showErrorMessage(`Chart ${val} not found`);
             return;
         }
         let ed = vscode.window.activeTextEditor;

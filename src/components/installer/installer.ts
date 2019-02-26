@@ -35,7 +35,7 @@ export async function installKubectl(shell: Shell): Promise<Errorable<void>> {
         fs.chmodSync(downloadFile, '0777');
     }
 
-    await addPathToConfig(`vs-kubernetes.${tool}-path`, downloadFile);
+    await addPathToConfig(`vs-kyma.${tool}-path`, downloadFile);
     return { succeeded: true, result: null };
 }
 
@@ -69,12 +69,12 @@ async function installToolFromTar(tool: string, urlTemplate: string, shell: Shel
     const installFolder = getInstallFolder(shell, tool);
     const executable = formatBin(tool, shell.platform());
     const url = urlTemplate.replace('{os_placeholder}', os);
-    const configKey = `vs-kubernetes.${tool}-path`;
+    const configKey = `vs-kyma.${tool}-path`;
     return installFromTar(url, installFolder, executable, configKey);
 }
 
 function getInstallFolder(shell: Shell, tool: string): string {
-    return path.join(shell.home(), `.vs-kubernetes/tools/${tool}`);
+    return path.join(shell.home(), `.vs-kyma/tools/${tool}`);
 }
 
 function platformUrlString(platform: Platform, supported?: Platform[]): string | null {
@@ -155,12 +155,12 @@ async function untar(sourceFile: string, destinationFolder: string): Promise<Err
         });
         return { succeeded: true, result: null };
     } catch (e) {
-        return { succeeded: false, error: [ "tar extract failed" ] /* TODO: extract error from exception */ };
+        return { succeeded: false, error: ["tar extract failed"] /* TODO: extract error from exception */ };
     }
 }
 
 async function addPathToConfig(configKey: string, executableFullPath: string): Promise<void> {
-    const config = vscode.workspace.getConfiguration().inspect("vs-kubernetes");
+    const config = vscode.workspace.getConfiguration().inspect("vs-kyma");
     await addPathToConfigAtScope(configKey, executableFullPath, vscode.ConfigurationTarget.Global, config.globalValue, true);
     await addPathToConfigAtScope(configKey, executableFullPath, vscode.ConfigurationTarget.Workspace, config.workspaceValue, false);
     await addPathToConfigAtScope(configKey, executableFullPath, vscode.ConfigurationTarget.WorkspaceFolder, config.workspaceFolderValue, false);
@@ -178,5 +178,5 @@ async function addPathToConfigAtScope(configKey: string, value: string, scope: v
         newValue = Object.assign({}, valueAtScope);
     }
     newValue[configKey] = value;
-    await vscode.workspace.getConfiguration().update("vs-kubernetes", newValue, scope);
+    await vscode.workspace.getConfiguration().update("vs-kyma", newValue, scope);
 }

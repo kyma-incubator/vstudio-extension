@@ -19,7 +19,7 @@ export class KubernetesResourceVirtualFileSystemProvider implements FileSystemPr
         // It would be quite neat to implement this to watch for changes
         // in the cluster and update the doc accordingly.  But that is very
         // definitely a future enhancement thing!
-        return new Disposable(() => {});
+        return new Disposable(() => { });
     }
 
     stat(uri: Uri): FileStat {
@@ -49,7 +49,7 @@ export class KubernetesResourceVirtualFileSystemProvider implements FileSystemPr
     }
 
     async loadResource(uri: Uri): Promise<string> {
-        const outputFormat = workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.outputFormat'];
+        const outputFormat = workspace.getConfiguration('vs-kyma')['vs-kyma.outputFormat'];
         const value = querystring.parse(uri.query).value;
         const sr = await this.kubectl.invokeAsyncWithProgress(`-o ${outputFormat} get ${value}`, `Loading ${value}...`);
 

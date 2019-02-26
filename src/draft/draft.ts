@@ -32,7 +32,7 @@ interface Context {
 
 class DraftImpl implements Draft {
     constructor(host: Host, fs: FS, shell: Shell, installDependenciesCallback: () => void, draftFound: boolean) {
-        this.context = { host : host, fs : fs, shell : shell, installDependenciesCallback : installDependenciesCallback, binFound : draftFound, binPath : 'draft' };
+        this.context = { host: host, fs: fs, shell: shell, installDependenciesCallback: installDependenciesCallback, binFound: draftFound, binPath: 'draft' };
     }
 
     private readonly context: Context;
@@ -90,10 +90,10 @@ async function invoke(context: Context, args: string): Promise<ShellResult> {
 async function up(context: Context): Promise<void> {
     if (await checkPresent(context, CheckPresentMode.Alert)) {
         if (context.shell.isUnix()) {
-            const term = context.host.createTerminal('draft up', `bash`, [ '-c', `draft up ; bash` ]);
+            const term = context.host.createTerminal('draft up', `bash`, ['-c', `draft up ; bash`]);
             term.show(true);
         } else {
-            const term = context.host.createTerminal('draft up', 'powershell.exe', [ '-NoExit', `draft`, `up` ]);
+            const term = context.host.createTerminal('draft up', 'powershell.exe', ['-NoExit', `draft`, `up`]);
             term.show(true);
         }
     }
@@ -113,7 +113,7 @@ async function pathCore(context: Context): Promise<string | undefined> {
 
 async function checkForDraftInternal(context: Context, mode: CheckPresentMode): Promise<boolean> {
     const binName = 'draft';
-    const bin = context.host.getConfiguration('vs-kubernetes')[`vs-kubernetes.${binName}-path`];
+    const bin = context.host.getConfiguration('vs-kyma')[`vs-kyma.${binName}-path`];
 
     const inferFailedMessage = 'Could not find "draft" binary.';
     const configuredFileMissingMessage = bin + ' does not exist!';

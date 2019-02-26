@@ -58,7 +58,7 @@ export class DebugSession implements IDebugSession {
         }
         const dockerfile = new DockerfileParser().parse(dockerfilePath);
         if (debugProvider) {
-            this.debugProvider = (await debugProvider.isDebuggerInstalled())? debugProvider : null;
+            this.debugProvider = (await debugProvider.isDebuggerInstalled()) ? debugProvider : null;
         } else {
             this.debugProvider = await this.pickupAndInstallDebugProvider(dockerfile.getBaseImage());
         }
@@ -79,28 +79,28 @@ export class DebugSession implements IDebugSession {
             let appName;
             try {
                 // Build/push docker image.
-                p.report({ message: "Building Docker image..."});
-                const shellOpts = Object.assign({ }, shell.execOpts(), { cwd });
+                p.report({ message: "Building Docker image..." });
+                const shellOpts = Object.assign({}, shell.execOpts(), { cwd });
                 const imageName = await this.buildDockerImage(imagePrefix, shellOpts);
 
                 // Run docker image in k8s container.
-                p.report({ message: "Running Docker image on Kubernetes..."});
+                p.report({ message: "Running Docker image on Kubernetes..." });
                 appName = await this.runAsDeployment(imageName, [portInfo.appPort, portInfo.debugPort], containerEnv);
 
                 // Find the running debug pod.
-                p.report({ message: "Finding the debug pod..."});
+                p.report({ message: "Finding the debug pod..." });
                 const podName = await this.findDebugPod(appName);
 
                 // Wait for the debug pod status to be running.
-                p.report({ message: "Waiting for the pod to be ready..."});
+                p.report({ message: "Waiting for the pod to be ready..." });
                 await this.waitForPod(podName);
 
                 // Setup port-forward.
-                p.report({ message: "Setting up port forwarding..."});
+                p.report({ message: "Setting up port forwarding..." });
                 const proxyResult = await this.setupPortForward(podName, portInfo.debugPort, portInfo.appPort);
 
                 // Start debug session.
-                p.report({ message: `Starting ${this.debugProvider.getDebuggerType()} debug session...`});
+                p.report({ message: `Starting ${this.debugProvider.getDebuggerType()} debug session...` });
                 await this.startDebugSession(appName, cwd, proxyResult);
             } catch (error) {
                 vscode.window.showErrorMessage(error);
@@ -136,8 +136,8 @@ export class DebugSession implements IDebugSession {
             containers: Container[] = [];
 
         const resource = pod ?
-                            await kubectlUtils.getResourceAsJson<Pod>(this.kubectl, `pod/${pod}`) :
-                            await kubectlUtils.getResourceAsJson<KubernetesCollection<Pod>>(this.kubectl, "pods");
+            await kubectlUtils.getResourceAsJson<Pod>(this.kubectl, `pod/${pod}`) :
+            await kubectlUtils.getResourceAsJson<KubernetesCollection<Pod>>(this.kubectl, "pods");
         if (!resource) {
             return;
         }
@@ -193,11 +193,11 @@ export class DebugSession implements IDebugSession {
         vscode.window.withProgress({ location: vscode.ProgressLocation.Window }, async (p) => {
             try {
                 // Setup port-forward.
-                p.report({ message: "Setting up port forwarding..."});
+                p.report({ message: "Setting up port forwarding..." });
                 const proxyResult = await this.setupPortForward(targetPod, portInfo.debugPort);
 
                 // Start debug session.
-                p.report({ message: `Starting ${this.debugProvider.getDebuggerType()} debug session...`});
+                p.report({ message: `Starting ${this.debugProvider.getDebuggerType()} debug session...` });
                 await this.startDebugSession(null, workspaceFolder.uri.fsPath, proxyResult);
             } catch (error) {
                 vscode.window.showErrorMessage(error);
@@ -235,7 +235,7 @@ export class DebugSession implements IDebugSession {
     private async runAsDeployment(image: string, exposedPorts: number[], containerEnv: any): Promise<string> {
         kubeChannel.showOutput(`Starting to run image ${image} on Kubernetes cluster...`, "Run on Kubernetes");
         const imageName = image.split(":")[0];
-        const baseName = imageName.substring(imageName.lastIndexOf("/")+1);
+        const baseName = imageName.substring(imageName.lastIndexOf("/") + 1);
         const deploymentName = `${baseName}-debug-${Date.now()}`;
         const appName = await kubectlUtils.runAsDeployment(this.kubectl, deploymentName, image, exposedPorts, containerEnv);
         kubeChannel.showOutput(`Finished launching image ${image} as a deployment ${appName} on Kubernetes cluster.`);
@@ -285,7 +285,7 @@ export class DebugSession implements IDebugSession {
     }
 
     private async promptForCleanup(resourceId: string): Promise<void> {
-        const autoCleanupFlag = vscode.workspace.getConfiguration("vs-kubernetes")["vs-kubernetes.autoCleanupOnDebugTerminate"];
+        const autoCleanupFlag = vscode.workspace.getConfiguration("vs-kyma")["vs-kyma.autoCleanupOnDebugTerminate"];
         if (autoCleanupFlag) {
             return await this.cleanupResource(resourceId);
         }
@@ -294,20 +294,20 @@ export class DebugSession implements IDebugSession {
             return await this.cleanupResource(resourceId);
         } else if (answer === "Always Clean Up") {
             // The object returned by VS Code API is readonly, clone it first.
-            const oldConfig = vscode.workspace.getConfiguration().inspect("vs-kubernetes");
+            const oldConfig = vscode.workspace.getConfiguration().inspect("vs-kyma");
             // Always update global config.
-            const globalConfig = <any> Object.assign({}, oldConfig.globalValue);
-            globalConfig["vs-kubernetes.autoCleanupOnDebugTerminate"] = true;
-            await vscode.workspace.getConfiguration().update("vs-kubernetes", globalConfig, vscode.ConfigurationTarget.Global);
+            const globalConfig = <any>Object.assign({}, oldConfig.globalValue);
+            globalConfig["vs-kyma.autoCleanupOnDebugTerminate"] = true;
+            await vscode.workspace.getConfiguration().update("vs-kyma", globalConfig, vscode.ConfigurationTarget.Global);
             // If workspace folder value exists, update it.
-            if (oldConfig.workspaceFolderValue && oldConfig.workspaceFolderValue["vs-kubernetes.autoCleanupOnDebugTerminate"] === false) {
-                const workspaceFolderConfig = <any> Object.assign({}, oldConfig.workspaceFolderValue);
-                workspaceFolderConfig["vs-kubernetes.autoCleanupOnDebugTerminate"] = true;
-                await vscode.workspace.getConfiguration().update("vs-kubernetes", workspaceFolderConfig, vscode.ConfigurationTarget.WorkspaceFolder);
-            } else if (oldConfig.workspaceValue && oldConfig.workspaceValue["vs-kubernetes.autoCleanupOnDebugTerminate"] === false) { // if workspace value exists, update it.
-                const workspaceConfig = <any> Object.assign({}, oldConfig.workspaceValue);
-                workspaceConfig["vs-kubernetes.autoCleanupOnDebugTerminate"] = true;
-                await vscode.workspace.getConfiguration().update("vs-kubernetes", workspaceConfig, vscode.ConfigurationTarget.Workspace);
+            if (oldConfig.workspaceFolderValue && oldConfig.workspaceFolderValue["vs-kyma.autoCleanupOnDebugTerminate"] === false) {
+                const workspaceFolderConfig = <any>Object.assign({}, oldConfig.workspaceFolderValue);
+                workspaceFolderConfig["vs-kyma.autoCleanupOnDebugTerminate"] = true;
+                await vscode.workspace.getConfiguration().update("vs-kyma", workspaceFolderConfig, vscode.ConfigurationTarget.WorkspaceFolder);
+            } else if (oldConfig.workspaceValue && oldConfig.workspaceValue["vs-kyma.autoCleanupOnDebugTerminate"] === false) { // if workspace value exists, update it.
+                const workspaceConfig = <any>Object.assign({}, oldConfig.workspaceValue);
+                workspaceConfig["vs-kyma.autoCleanupOnDebugTerminate"] = true;
+                await vscode.workspace.getConfiguration().update("vs-kyma", workspaceConfig, vscode.ConfigurationTarget.Workspace);
             }
             return await this.cleanupResource(resourceId);
         }

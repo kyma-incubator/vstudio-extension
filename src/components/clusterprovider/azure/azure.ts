@@ -205,7 +205,7 @@ function locationDisplayNames(names: string[], preview: boolean, locationInfo: L
 }
 
 function locationDisplayNamesEx(production: string[], preview: string[], locationInfo: Locations): ServiceLocation[] {
-    let result = locationDisplayNames(production, false, locationInfo) ;
+    let result = locationDisplayNames(production, false, locationInfo);
     result = result.concat(locationDisplayNames(preview, true, locationInfo));
     return result;
 }
@@ -215,7 +215,7 @@ export async function listVMSizes(context: Context, location: string): Promise<E
 
     return fromShellJson<string[]>(sr,
         (response: any[]) => response.map((r) => r.name as string)
-                                      .filter((name) => !name.startsWith('Basic_'))
+            .filter((name) => !name.startsWith('Basic_'))
     );
 }
 
@@ -335,7 +335,7 @@ async function downloadKubectlCli(context: Context, clusterType: string): Promis
 }
 
 async function getCredentials(context: Context, clusterType: string, clusterName: string, clusterGroup: string, maxAttempts: number): Promise<any> {
-    const kubeconfig: string = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.kubeconfig'];
+    const kubeconfig: string = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.kubeconfig'];
     const kubeconfigFileOption = kubeconfig ? `-f "${kubeconfig}"` : '';
     let attempts = 0;
     while (true) {

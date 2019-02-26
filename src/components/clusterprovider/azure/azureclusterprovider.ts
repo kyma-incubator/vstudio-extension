@@ -40,13 +40,13 @@ export async function init(registry: clusterproviderregistry.ClusterProviderRegi
         wizardServer.get('/configure', (req, resp, n) => htmlServer.handleGetConfigure(req, resp, n));
         wizardServer.post('/configure', (req, resp, n) => htmlServer.handlePostConfigure(req, resp, n));
 
-        registry.register({id: 'aks', displayName: "Azure Kubernetes Service", port: wizardPort, supportedActions: ['create','configure']});
-        registry.register({id: 'acs', displayName: "Azure Container Service", port: wizardPort, supportedActions: ['create','configure']});
+        registry.register({ id: 'aks', displayName: "Azure Kubernetes Service", port: wizardPort, supportedActions: ['create', 'configure'] });
+        registry.register({ id: 'acs', displayName: "Azure Container Service", port: wizardPort, supportedActions: ['create', 'configure'] });
     }
 }
 
 class HtmlServer {
-    constructor(private readonly context: azure.Context) {}
+    constructor(private readonly context: azure.Context) { }
 
     async handleGetCreate(request: restify.Request, response: restify.Response, next: restify.Next) {
         await this.handleCreate(request, { clusterType: request.query["clusterType"] }, response, next);
@@ -301,7 +301,8 @@ async function createCluster(previousData: any, context: azure.Context): Promise
             count: previousData.agentcount,
             vmSize: previousData.agentvmsize
 
-        } };
+        }
+    };
     const createResult = await azure.createCluster(context, options);
 
     const title = createResult.result.succeeded ? 'Cluster creation has started' : `Error ${createResult.actionDescription}`;
@@ -375,7 +376,7 @@ function renderConfigurationResult(configureResult: ActionResult<azure.Configure
     const clusterServiceString = result.result.clusterType === "aks" ? "Azure Kubernetes Service" : "Azure Container Service";
 
     const pathMessage = configResult.cliOnDefaultPath ? '' :
-        '<p>This location is not on your system PATH. Add this directory to your path, or set the VS Code <b>vs-kubernetes.kubectl-path</b> config setting.</p>';
+        '<p>This location is not on your system PATH. Add this directory to your path, or set the VS Code <b>vs-kyma.kubectl-path</b> config setting.</p>';
     const getCliOutput = configResult.gotCli ?
         `<p class='success'>kubectl installed at ${configResult.cliInstallFile}</p>${pathMessage}` :
         `<p class='error'>An error occurred while downloading kubectl.</p>

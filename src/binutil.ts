@@ -56,7 +56,7 @@ function alertNoBin(host: Host, binName: string, failureReason: CheckPresentFail
                 (str) => {
                     switch (str) {
                         case 'Learn more':
-                            host.showInformationMessage(`Add ${binName} directory to path, or set "vs-kubernetes.${binName}-path" config to ${binName} binary.`);
+                            host.showInformationMessage(`Add ${binName} directory to path, or set "vs-kyma.${binName}-path" config to ${binName} binary.`);
                             break;
                         case 'Install dependencies':
                             installDependencies();

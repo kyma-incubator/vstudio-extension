@@ -36,7 +36,7 @@ interface Context {
 
 class KubectlImpl implements Kubectl {
     constructor(host: Host, fs: FS, shell: Shell, installDependenciesCallback: () => void, kubectlFound: boolean) {
-        this.context = { host : host, fs : fs, shell : shell, installDependenciesCallback : installDependenciesCallback, binFound : kubectlFound, binPath : 'kubectl' };
+        this.context = { host: host, fs: fs, shell: shell, installDependenciesCallback: installDependenciesCallback, binFound: kubectlFound, binPath: 'kubectl' };
     }
 
     private readonly context: Context;
@@ -89,7 +89,7 @@ class KubectlImpl implements Kubectl {
                 }
             });
             this.context.host.onDidChangeConfiguration((change) => {
-                if (change.affectsConfiguration('vs-kubernetes') && this.sharedTerminal) {
+                if (change.affectsConfiguration('vs-kyma') && this.sharedTerminal) {
                     this.sharedTerminal.dispose();
                 }
             });
@@ -114,7 +114,7 @@ async function checkPresent(context: Context, errorMessageMode: CheckPresentMess
 
 async function checkForKubectlInternal(context: Context, errorMessageMode: CheckPresentMessageMode): Promise<boolean> {
     const binName = 'kubectl';
-    const bin = context.host.getConfiguration('vs-kubernetes')[`vs-kubernetes.${binName}-path`];
+    const bin = context.host.getConfiguration('vs-kyma')[`vs-kyma.${binName}-path`];
 
     const contextMessage = getCheckKubectlContextMessage(errorMessageMode);
     const inferFailedMessage = 'Could not find "kubectl" binary.' + contextMessage;
@@ -191,7 +191,7 @@ async function kubectlInternal(context: Context, command: string, handler: Shell
     if (await checkPresent(context, 'command')) {
         const bin = baseKubectlPath(context);
         let cmd = bin + ' ' + command;
-        context.shell.exec(cmd, null).then(({code, stdout, stderr}) => handler(code, stdout, stderr));
+        context.shell.exec(cmd, null).then(({ code, stdout, stderr }) => handler(code, stdout, stderr));
     }
 }
 
@@ -208,7 +208,7 @@ function kubectlDone(context: Context): ShellHandler {
 }
 
 function baseKubectlPath(context: Context): string {
-    let bin = context.host.getConfiguration('vs-kubernetes')['vs-kubernetes.kubectl-path'];
+    let bin = context.host.getConfiguration('vs-kyma')['vs-kyma.kubectl-path'];
     if (!bin) {
         bin = 'kubectl';
     }
@@ -224,7 +224,7 @@ async function asLines(context: Context, command: string): Promise<Errorable<str
         return { succeeded: true, result: lines };
 
     }
-    return { succeeded: false, error: [ shellResult.stderr ] };
+    return { succeeded: false, error: [shellResult.stderr] };
 }
 
 async function asJson<T>(context: Context, command: string): Promise<Errorable<T>> {
@@ -233,7 +233,7 @@ async function asJson<T>(context: Context, command: string): Promise<Errorable<T
         return { succeeded: true, result: JSON.parse(shellResult.stdout.trim()) as T };
 
     }
-    return { succeeded: false, error: [ shellResult.stderr ] };
+    return { succeeded: false, error: [shellResult.stderr] };
 }
 
 function path(context: Context): string {

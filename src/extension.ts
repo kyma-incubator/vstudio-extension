@@ -510,7 +510,7 @@ function maybeRunKubernetesCommandForActiveWindow(command, progressMessage) {
         vscode.window.showErrorMessage('This command operates on the open document. Open your Kubernetes resource file, and try again.');
         return false; // No open text editor
     }
-    let namespace = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.namespace'];
+    let namespace = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.namespace'];
     if (namespace) {
         command = command + ' --namespace ' + namespace + ' ';
     }
@@ -655,7 +655,7 @@ function loadKubernetes(explorerNode?: explorer.ResourceNode) {
 }
 
 function loadKubernetesCore(value: string) {
-    const outputFormat = vscode.workspace.getConfiguration('vs-kubernetes')['vs-kubernetes.outputFormat'];
+    const outputFormat = vscode.workspace.getConfiguration('vs-kyma')['vs-kyma.outputFormat'];
     const docname = `${value.replace('/', '-')}.${outputFormat}`;
     const nonce = new Date().getTime();
     const uri = `${K8S_RESOURCE_SCHEME}://loadkubernetescore/${docname}?value=${value}&_=${nonce}`;

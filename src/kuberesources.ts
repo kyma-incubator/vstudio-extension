@@ -22,7 +22,7 @@ export const allKinds = {
     ingress: new ResourceKind("Ingress", "Ingress", "ingress"),
     lambda: new ResourceKind("Lambda", "Lambdas", "configmap"),
     api: new ResourceKind("Api", "Apis", "api"),
-    remoteenvironment: new ResourceKind("Remote Environment", "Remote Environments", "remoteenvironment")
+    application: new ResourceKind("Application", "Applications", "application")
 };
 
 export const commonKinds = [

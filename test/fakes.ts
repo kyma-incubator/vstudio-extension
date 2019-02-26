@@ -51,7 +51,7 @@ export function host(settings: FakeHostSettings = {}): any {
             return { then: (s) => s('Close') };
         },
         getConfiguration: (key: string) => {
-            if (key !== 'vs-kubernetes') {
+            if (key !== 'vs-kyma') {
                 throw 'unexpected configuration section';
             }
             return settings.configuration || { };

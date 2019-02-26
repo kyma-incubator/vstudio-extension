@@ -2,7 +2,7 @@
     "name": "vscode-kyma-tools",
     "displayName": "Kyma",
     "description": "Develop, deploy and debug Kyma applications",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "preview": true,
     "publisher": "hybris-kyma-tools",
     "engines": {
@@ -20,6 +20,7 @@
         "draft",
         "azure"
     ],
+    "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "icon": "images/Kyma-Logo-Symbol.jpg",
     "activationEvents": [
         "onCommand:extension.vsKubernetesCreate",
@@ -70,41 +71,41 @@
     "contributes": {
         "configuration": {
             "type": "object",
-            "title": "Kubernetes configuration",
+            "title": "Kyma configuration",
             "properties": {
-                "vs-kubernetes": {
+                "vs-kyma": {
                     "type": "object",
-                    "description": "Kubernetes configuration",
+                    "description": "Kyma configuration",
                     "properties": {
-                        "vs-kubernetes.namespace": {
+                        "vs-kyma.namespace": {
                             "type": "string",
                             "description": "The namespace to use for all commands"
                         },
-                        "vs-kubernetes.kubectl-path": {
+                        "vs-kyma.kubectl-path": {
                             "type": "string",
                             "description": "File path to a kubectl binary."
                         },
-                        "kyma.schema-server-port": {
+                        "vs-kyma.schema-server-port": {
                             "type": "number",
                             "description": "port which schema server listens to"
                         },
-                        "vs-kubernetes.helm-path": {
+                        "vs-kyma.helm-path": {
                             "type": "string",
                             "description": "File path to a helm binary."
                         },
-                        "vs-kubernetes.draft-path": {
+                        "vs-kyma.draft-path": {
                             "type": "string",
                             "description": "File path to a draft binary."
                         },
-                        "vs-kubernetes.kubeconfig": {
+                        "vs-kyma.kubeconfig": {
                             "type": "string",
                             "description": "File path to the kubeconfig file."
                         },
-                        "vs-kubernetes.autoCleanupOnDebugTerminate": {
+                        "vs-kyma.autoCleanupOnDebugTerminate": {
                             "type": "boolean",
                             "description": "Once the debug session is terminated, automatically clean up the created Deployment and associated Pod by the command \"Kubernetes: Debug (Launch)\"."
                         },
-                        "vs-kubernetes.outputFormat": {
+                        "vs-kyma.outputFormat": {
                             "enum": [
                                 "json",
                                 "yaml"
@@ -114,14 +115,14 @@
                         }
                     },
                     "default": {
-                        "vs-kubernetes.namespace": "",
-                        "vs-kubernetes.kubectl-path": "",
-                        "vs-kubernetes.helm-path": "",
-                        "vs-kubernetes.draft-path": "",
-                        "vs-kubernetes.outputFormat": "yaml",
-                        "vs-kubernetes.kubeconfig": "",
-                        "vs-kubernetes.autoCleanupOnDebugTerminate": false,
-                        "kyma.schema-server-port": 44002
+                        "vs-kyma.namespace": "",
+                        "vs-kyma.kubectl-path": "",
+                        "vs-kyma.helm-path": "",
+                        "vs-kyma.draft-path": "",
+                        "vs-kyma.outputFormat": "yaml",
+                        "vs-kyma.kubeconfig": "",
+                        "vs-kyma.autoCleanupOnDebugTerminate": false,
+                        "vs-kyma.schema-server-port": 44002
                     }
                 },
                 "vsdocker.imageUser": {

@@ -20,7 +20,6 @@
         "draft",
         "azure"
     ],
-    "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "icon": "images/Kyma-Logo-Symbol.jpg",
     "activationEvents": [
         "onCommand:extension.vsKubernetesCreate",
@@ -133,7 +132,7 @@
             }
         },
         "views": {
-            "kubernetesView": [
+            "kymaView": [
                 {
                     "id": "extension.vsKubernetesExplorer",
                     "name": "Overview"
@@ -144,7 +143,7 @@
             "activitybar": [
                 {
                     "icon": "images/logo.svg",
-                    "id": "kubernetesView",
+                    "id": "kymaView",
                     "title": "Kyma"
                 }
             ]

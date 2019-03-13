@@ -56,5 +56,4 @@
 ---
 ### Known Problems
 - Check issues.
----
-- \* This plugin currently relies on unstable version of `kubeless`. `Kubeless` had a bug that prevented this code from working correctly. While the issue is fixed now, the fix is in a unreleased version of kubeless. For more info: [Github issue](https://github.com/kubeless/kubeless/issues/874#event-1769345570)
+

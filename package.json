@@ -845,7 +845,7 @@
         "graceful-fs": "^4.1.15",
         "js-yaml": "^3.13.1",
         "k8s": "^0.4.12",
-        "lodash": "^4.17.11",
+        "lodash": "^4.17.13",
         "mkdirp": "^0.5.1",
         "natives": "^1.1.6",
         "node-yaml-parser": "^0.0.9",
